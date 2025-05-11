@@ -4,13 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource.dart';
 import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource_impl.dart';
 import 'package:sellatrack/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:sellatrack/features/auth/domain/entities/auth_user_entity.dart';
 import 'package:sellatrack/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sellatrack/features/auth/domain/usecases/get_auth_state_changes_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/sign_in_with_otp_usecase.dart';
+import 'package:sellatrack/features/auth/domain/usecases/sign_in_with_email_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:sellatrack/features/auth/domain/usecases/sign_up_with_email_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/update_user_profile_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/verify_phone_number_usecase.dart';
 
 // --- CORE SERVICE PROVIDERS ---
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
@@ -37,17 +38,17 @@ final getAuthStateChangesUseCaseProvider = Provider<GetAuthStateChangesUseCase>(
   },
 );
 
-final verifyPhoneNumberUseCaseProvider = Provider<VerifyPhoneNumberUseCase>((
-  ref,
-) {
-  final repository = ref.watch(authRepositoryProvider);
-  return VerifyPhoneNumberUseCase(repository);
-});
+final signUpWithEmailPasswordUseCaseProvider =
+    Provider<SignUpWithEmailPasswordUseCase>((ref) {
+      final repository = ref.watch(authRepositoryProvider);
+      return SignUpWithEmailPasswordUseCase(repository);
+    });
 
-final signInWithOtpUseCaseProvider = Provider<SignInWithOtpUseCase>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return SignInWithOtpUseCase(repository);
-});
+final signInWithEmailPasswordUseCaseProvider =
+    Provider<SignInWithEmailPasswordUseCase>((ref) {
+      final repository = ref.watch(authRepositoryProvider);
+      return SignInWithEmailPasswordUseCase(repository);
+    });
 
 final updateUserProfileUseCaseProvider = Provider<UpdateUserProfileUseCase>((
   ref,
@@ -66,5 +67,18 @@ final signOutUseCaseProvider = Provider<SignOutUseCase>((ref) {
   return SignOutUseCase(repository);
 });
 
+// Optional:
+// final sendCurrentUserEmailVerificationUseCaseProvider = Provider<SendCurrentUserEmailVerificationUseCase>(
+//   (ref) {
+//     final repository = ref.watch(authRepositoryProvider);
+//     return SendCurrentUserEmailVerificationUseCase(repository);
+//   },
+// );
+
+// --- APP STATE PROVIDERS (or Auth State Providers) ---
+final authStateChangesProvider = StreamProvider<AuthUserEntity?>((ref) {
+  final getAuthStateChanges = ref.watch(getAuthStateChangesUseCaseProvider);
+  return getAuthStateChanges.call();
+});
+
 // --- Other feature providers would go below, or in separate files within core/di/ ---
-// e.g., Sales Providers, Expense Providers

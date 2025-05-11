@@ -17,15 +17,26 @@ class FirebaseAuthDatasourceImpl implements FirebaseAuthDatasource {
   }
 
   @override
-  Future<firebase_auth.User?> signInWithOtp({
-    required String verificationId,
-    required String smsCode,
+  Future<firebase_auth.User?> signUpWithEmailPasswordWithFirebase({
+    required String email,
+    required String password,
   }) async {
-    final credential = firebase_auth.PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
+    final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
-    final userCredential = await _firebaseAuth.signInWithCredential(credential);
+    return userCredential.user;
+  }
+
+  @override
+  Future<firebase_auth.User?> signInWithEmailPasswordWithFirebase({
+    required String email,
+    required String password,
+  }) async {
+    final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
     return userCredential.user;
   }
 
@@ -57,51 +68,9 @@ class FirebaseAuthDatasourceImpl implements FirebaseAuthDatasource {
   }
 
   @override
-  Future<void> verifyPhoneNumber({
-    required String phoneNumber,
-    required void Function(String verificationId, int? resendToken) codeSent,
-    required void Function(String verificationId) codeAutoRetrievalTimeout,
-    required void Function(firebase_auth.User firebaseUser)
-    verificationCompleted,
-    required void Function(firebase_auth.FirebaseAuthException exception)
-    verificationFailed,
-    Duration timeout = const Duration(seconds: 60),
+  Future<void> sendPasswordResetEmailWithFirebase({
+    required String email,
   }) async {
-    await _firebaseAuth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (
-        firebase_auth.PhoneAuthCredential credential,
-      ) async {
-        try {
-          final userCredential = await _firebaseAuth.signInWithCredential(
-            credential,
-          );
-          if (userCredential.user != null) {
-            verificationCompleted(userCredential.user!);
-          } else {
-            verificationFailed(
-              firebase_auth.FirebaseAuthException(
-                code: 'null-user-after-credential-signin',
-                message:
-                    'User was null after signing in with auto-retrieved credential.',
-              ),
-            );
-          }
-        } on firebase_auth.FirebaseAuthException catch (e) {
-          verificationFailed(e);
-        } catch (e) {
-          verificationFailed(
-            firebase_auth.FirebaseAuthException(
-              code: 'unknown-error-during-auto-retrieval-signin',
-              message: e.toString(),
-            ),
-          );
-        }
-      },
-      verificationFailed: verificationFailed,
-      codeSent: codeSent,
-      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
-      timeout: timeout,
-    );
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 }

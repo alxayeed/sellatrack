@@ -5,31 +5,33 @@ enum AuthStatus {
   initial,
   loading,
   error,
-  codeSent,
   profileIncomplete,
   authenticated,
   unauthenticated,
+  passwordResetEmailSent,
+  // Optional: emailVerificationSent,
 }
 
 class AuthScreenState extends Equatable {
   final AuthStatus status;
   final AuthUserEntity? user;
   final String? errorMessage;
-  final String? verificationId;
-  final int? resendToken;
-  final bool isLoadingVerifyPhoneNumber;
-  final bool isLoadingSignInWithOtp;
+  final bool isLoadingSignUp;
+  final bool isLoadingSignIn;
   final bool isLoadingUpdateProfile;
+  final bool isLoadingPasswordReset;
+
+  // Optional: final bool isLoadingEmailVerification;
 
   const AuthScreenState({
     this.status = AuthStatus.initial,
     this.user,
     this.errorMessage,
-    this.verificationId,
-    this.resendToken,
-    this.isLoadingVerifyPhoneNumber = false,
-    this.isLoadingSignInWithOtp = false,
+    this.isLoadingSignUp = false,
+    this.isLoadingSignIn = false,
     this.isLoadingUpdateProfile = false,
+    this.isLoadingPasswordReset = false,
+    // this.isLoadingEmailVerification = false,
   });
 
   AuthScreenState copyWith({
@@ -37,28 +39,25 @@ class AuthScreenState extends Equatable {
     AuthUserEntity? user,
     String? errorMessage,
     bool clearErrorMessage = false,
-    String? verificationId,
-    bool clearVerificationId = false,
-    int? resendToken,
-    bool clearResendToken = false,
-    bool? isLoadingVerifyPhoneNumber,
-    bool? isLoadingSignInWithOtp,
+    bool? isLoadingSignUp,
+    bool? isLoadingSignIn,
     bool? isLoadingUpdateProfile,
+    bool? isLoadingPasswordReset,
+    // bool? isLoadingEmailVerification,
   }) {
     return AuthScreenState(
       status: status ?? this.status,
       user: user ?? this.user,
       errorMessage:
           clearErrorMessage ? null : errorMessage ?? this.errorMessage,
-      verificationId:
-          clearVerificationId ? null : verificationId ?? this.verificationId,
-      resendToken: clearResendToken ? null : resendToken ?? this.resendToken,
-      isLoadingVerifyPhoneNumber:
-          isLoadingVerifyPhoneNumber ?? this.isLoadingVerifyPhoneNumber,
-      isLoadingSignInWithOtp:
-          isLoadingSignInWithOtp ?? this.isLoadingSignInWithOtp,
+      isLoadingSignUp: isLoadingSignUp ?? this.isLoadingSignUp,
+      isLoadingSignIn: isLoadingSignIn ?? this.isLoadingSignIn,
       isLoadingUpdateProfile:
           isLoadingUpdateProfile ?? this.isLoadingUpdateProfile,
+      isLoadingPasswordReset:
+          isLoadingPasswordReset ?? this.isLoadingPasswordReset,
+      // isLoadingEmailVerification:
+      //     isLoadingEmailVerification ?? this.isLoadingEmailVerification,
     );
   }
 
@@ -67,10 +66,10 @@ class AuthScreenState extends Equatable {
     status,
     user,
     errorMessage,
-    verificationId,
-    resendToken,
-    isLoadingVerifyPhoneNumber,
-    isLoadingSignInWithOtp,
+    isLoadingSignUp,
+    isLoadingSignIn,
     isLoadingUpdateProfile,
+    isLoadingPasswordReset,
+    // isLoadingEmailVerification,
   ];
 }

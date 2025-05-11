@@ -34,15 +34,36 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUserEntity?> signInWithOtp({
-    required String verificationId,
-    required String smsCode,
+  Future<AuthUserEntity?> signUpWithEmailPassword({
+    required String email,
+    required String password,
   }) async {
     try {
-      final firebaseUser = await firebaseAuthDatasource.signInWithOtp(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
+      final firebaseUser = await firebaseAuthDatasource
+          .signUpWithEmailPasswordWithFirebase(
+            email: email,
+            password: password,
+          );
+      if (firebaseUser == null) {
+        return null;
+      }
+      return AuthUserModel.fromFirebaseAuthUser(firebaseUser).toEntity();
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw Exception(e.message);
+    }
+  }
+
+  @override
+  Future<AuthUserEntity?> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final firebaseUser = await firebaseAuthDatasource
+          .signInWithEmailPasswordWithFirebase(
+            email: email,
+            password: password,
+          );
       if (firebaseUser == null) {
         return null;
       }
@@ -79,27 +100,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> verifyPhoneNumber({
-    required String phoneNumber,
-    required void Function(String verificationId, int? resendToken) codeSent,
-    required void Function(String verificationId) codeAutoRetrievalTimeout,
-    required void Function(AuthUserEntity authUserEntity) verificationCompleted,
-    required void Function(String error) verificationFailed,
-    Duration timeout = const Duration(seconds: 60),
-  }) async {
-    return firebaseAuthDatasource.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      codeSent: codeSent,
-      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
-      verificationCompleted: (firebase_auth.User firebaseUser) {
-        verificationCompleted(
-          AuthUserModel.fromFirebaseAuthUser(firebaseUser).toEntity(),
-        );
-      },
-      verificationFailed: (firebase_auth.FirebaseAuthException exception) {
-        verificationFailed(exception.message ?? 'Unknown verification error');
-      },
-      timeout: timeout,
-    );
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await firebaseAuthDatasource.sendPasswordResetEmailWithFirebase(
+        email: email,
+      );
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw Exception(e.message);
+    }
   }
 }
