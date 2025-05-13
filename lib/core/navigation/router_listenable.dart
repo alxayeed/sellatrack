@@ -9,84 +9,83 @@ class RouterListenable extends ChangeNotifier {
   final Ref _ref;
   bool _isLoggedIn = false;
   bool _isProfileComplete = false;
+  bool _initialCheckDone = false;
 
   RouterListenable(this._ref) {
+    _performInitialSetup();
+
     _ref.listen<AsyncValue<AuthUserEntity?>>(
-      authStateChangesProvider, // From core/di/providers.dart
-      (previous, next) {
-        final newIsLoggedIn = next.valueOrNull != null;
-        bool newIsProfileComplete = false;
-
-        if (newIsLoggedIn) {
-          final authNotifierState = _ref.read(authNotifierProvider);
-          newIsProfileComplete =
-              authNotifierState.status == AuthStatus.authenticated &&
-              (authNotifierState.user?.displayName != null &&
-                  authNotifierState.user!.displayName!.isNotEmpty);
-        }
-
-        if (_isLoggedIn != newIsLoggedIn ||
-            _isProfileComplete != newIsProfileComplete) {
-          _isLoggedIn = newIsLoggedIn;
-          _isProfileComplete = newIsProfileComplete;
-          notifyListeners();
-        }
-      },
-      fireImmediately: true, // Ensure it fires with current value on listen
+      authStateChangesProvider,
+      (previous, next) => _evaluateAndNotify(),
+      fireImmediately: true,
     );
 
     _ref.listen<AuthScreenState>(
       authNotifierProvider,
-      // From features/auth/presentation/providers/auth_providers.dart
-      (previous, next) {
-        final newIsLoggedIn =
-            next.status == AuthStatus.authenticated ||
-            next.status == AuthStatus.profileIncomplete;
-        final newIsProfileComplete =
-            next.status == AuthStatus.authenticated &&
-            (next.user?.displayName != null &&
-                next.user!.displayName!.isNotEmpty);
-
-        if (_isLoggedIn != newIsLoggedIn ||
-            _isProfileComplete != newIsProfileComplete) {
-          _isLoggedIn = newIsLoggedIn;
-          _isProfileComplete = newIsProfileComplete;
-          notifyListeners();
-        }
-      },
-      fireImmediately: true, // Ensure it fires with current value on listen
+      (previous, next) => _evaluateAndNotify(),
+      fireImmediately: true,
     );
+  }
 
-    // Perform initial check, and trigger AuthNotifier to check current user if needed
-    // This ensures that if authStateChangesProvider is already resolved (e.g. user already logged in on app start)
-    // and AuthNotifier hasn't yet determined profile completeness, it gets a chance.
-    final initialAuthAsync = _ref.read(authStateChangesProvider);
-    _isLoggedIn = initialAuthAsync.when(
-      data: (user) => user != null,
-      loading: () => false, // Or based on previous known state if persisted
-      error: (_, __) => false,
-    );
+  Future<void> _performInitialSetup() async {
+    final authAsync = _ref.read(authStateChangesProvider);
+    final initialFirebaseUser = authAsync.valueOrNull;
+    _isLoggedIn = initialFirebaseUser != null;
 
     if (_isLoggedIn) {
-      final initialNotifierState = _ref.read(authNotifierProvider);
-      _isProfileComplete =
-          initialNotifierState.status == AuthStatus.authenticated &&
-          (initialNotifierState.user?.displayName != null &&
-              initialNotifierState.user!.displayName!.isNotEmpty);
+      final authNotifier = _ref.read(authNotifierProvider.notifier);
+      final currentNotifierState = _ref.read(authNotifierProvider);
 
-      if (initialNotifierState.status == AuthStatus.initial) {
-        Future.microtask(
-          () => _ref.read(authNotifierProvider.notifier).checkCurrentUser(),
-        );
+      if (currentNotifierState.status == AuthStatus.initial ||
+          currentNotifierState.user?.uid != initialFirebaseUser!.uid) {
+        await authNotifier.checkCurrentUser();
+      }
+    }
+
+    _evaluateCurrentStatesFromProviders();
+    _initialCheckDone = true;
+    notifyListeners();
+  }
+
+  void _evaluateCurrentStatesFromProviders() {
+    final authAsync = _ref.read(authStateChangesProvider);
+    _isLoggedIn = authAsync.valueOrNull != null;
+
+    if (_isLoggedIn) {
+      final authNotifierState = _ref.read(authNotifierProvider);
+      _isProfileComplete =
+          authNotifierState.status == AuthStatus.authenticated &&
+          (authNotifierState.user?.displayName != null &&
+              authNotifierState.user!.displayName!.isNotEmpty);
+      if (authNotifierState.status == AuthStatus.profileIncomplete) {
+        _isProfileComplete = false;
       }
     } else {
       _isProfileComplete = false;
     }
   }
 
+  void _evaluateAndNotify() {
+    final oldIsLoggedIn = _isLoggedIn;
+    final oldIsProfileComplete = _isProfileComplete;
+
+    _evaluateCurrentStatesFromProviders();
+
+    if (!_initialCheckDone) {
+      return;
+    }
+
+    if (oldIsLoggedIn != _isLoggedIn ||
+        oldIsProfileComplete != _isProfileComplete) {
+      notifyListeners();
+    }
+  }
+
   bool get isLoggedIn => _isLoggedIn;
 
   bool get isProfileComplete => _isProfileComplete;
+
+  bool get initialCheckDone => _initialCheckDone;
 }
 
 final routerListenableProvider = Provider<RouterListenable>((ref) {

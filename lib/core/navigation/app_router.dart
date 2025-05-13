@@ -6,31 +6,28 @@ import 'package:sellatrack/features/auth/presentation/screens/profile_completion
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/update_profile_screen.dart';
 
-import 'router_listenable.dart'; // Import the new listenable
+import '../../features/sales/presentation/screens/sale_list_screen.dart';
+import 'router_listenable.dart';
 
 class AppRoutePaths {
+  static const String splash = '/';
   static const String authentication = '/auth';
-  static const String otp = '/otp';
   static const String profileCompletion = '/complete-profile';
   static const String profile = '/profile';
   static const String updateProfileSubPath = 'edit';
   static const String updateProfileNamed = 'update-profile';
-  static const String splash = '/'; // Add a splash/loading route
+  static const String sales = '/sales';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Provide the GoRouter
-  final routerRefreshListenable = ref.watch(routerListenableProvider);
+  final routerListener = ref.watch(routerListenableProvider);
 
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
-    // Start at a splash/loading screen
     debugLogDiagnostics: true,
-    refreshListenable: routerRefreshListenable,
-    // Key for reactive redirects
+    // refreshListenable: routerListener,
     routes: <RouteBase>[
       GoRoute(
-        // A simple splash/loading screen
         path: AppRoutePaths.splash,
         builder:
             (context, state) => const Scaffold(
@@ -64,44 +61,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(
+        path: AppRoutePaths.sales,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SaleListScreen();
+        },
+      ),
     ],
     redirect: (BuildContext context, GoRouterState state) {
-      final bool isLoggedIn = routerRefreshListenable.isLoggedIn;
-      final bool isProfileConsideredComplete =
-          routerRefreshListenable.isProfileComplete;
+      if (!routerListener.initialCheckDone) {
+        return AppRoutePaths.splash;
+      }
 
+      final bool isLoggedIn = routerListener.isLoggedIn;
+      final bool isProfileComplete = routerListener.isProfileComplete;
       final String currentLocation = state.matchedLocation;
-      final bool isAtSplash = currentLocation == AppRoutePaths.splash;
-      final bool isOnAuthFlow =
-          currentLocation == AppRoutePaths.authentication ||
-          currentLocation == AppRoutePaths.otp;
+
+      final bool isOnAuthScreen =
+          currentLocation == AppRoutePaths.authentication;
       final bool isOnProfileCompletion =
           currentLocation == AppRoutePaths.profileCompletion;
+      final bool isOnSplash = currentLocation == AppRoutePaths.splash;
 
-      if (isAtSplash && !isLoggedIn) return AppRoutePaths.authentication;
-      if (isAtSplash && isLoggedIn && !isProfileConsideredComplete) {
-        return AppRoutePaths.profileCompletion;
-      }
-      if (isAtSplash && isLoggedIn && isProfileConsideredComplete) {
-        return AppRoutePaths.profile;
-      }
-
-      if (!isLoggedIn && !isOnAuthFlow) {
+      if (!isLoggedIn) {
+        // if (isOnAuthScreen || isOnSplash) {
+        //   return null;
+        // }
         return AppRoutePaths.authentication;
-      }
-
-      if (isLoggedIn) {
-        if (!isProfileConsideredComplete &&
-            !isOnProfileCompletion &&
-            !isOnAuthFlow) {
-          // If profile not complete, but user tries to go somewhere else (not auth or completion), send to completion.
-          // Exception: if user is in OTP flow (part of auth) or already on completion, let them be.
+      } else {
+        if (!isProfileComplete) {
+          if (isOnProfileCompletion || isOnAuthScreen || isOnSplash) {
+            return null;
+          }
           return AppRoutePaths.profileCompletion;
-        }
-        if (isProfileConsideredComplete &&
-            (isOnAuthFlow || isOnProfileCompletion)) {
-          // If profile is complete and user is on auth/otp/completion, send to profile.
-          return AppRoutePaths.profile;
+        } else {
+          return AppRoutePaths.sales;
+          if (isOnAuthScreen || isOnProfileCompletion || isOnSplash) {}
         }
       }
       return null;
