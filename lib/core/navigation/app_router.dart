@@ -95,8 +95,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           }
           return AppRoutePaths.profileCompletion;
         } else {
+          if (currentLocation == AppRoutePaths.profile) {
+            return AppRoutePaths.profile;
+          }
           return AppRoutePaths.sales;
-          if (isOnAuthScreen || isOnProfileCompletion || isOnSplash) {}
         }
       }
       return null;
