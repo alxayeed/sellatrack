@@ -7,12 +7,15 @@ class UpdateCustomerPhotoUrlUseCase {
 
   Future<void> call({
     required String customerId,
-    required String? photoUrl,
+    required String photoUrl, // Now non-nullable
   }) async {
     if (customerId.isEmpty) {
       throw ArgumentError('Customer ID cannot be empty.');
     }
-    // Basic URL validation could be added here if photoUrl is not null
+    if (photoUrl.isEmpty) {
+      throw ArgumentError('Photo URL cannot be empty when updating.');
+    }
+    // Basic URL validation could be added here
     return repository.updateCustomerPhotoUrl(
       customerId: customerId,
       photoUrl: photoUrl,

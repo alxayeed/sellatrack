@@ -22,8 +22,10 @@ abstract class CustomerRepository {
 
   Future<void> updateCustomerPhotoUrl({
     required String customerId,
-    required String? photoUrl,
+    required String photoUrl,
   });
+
+  Future<void> deleteCustomerPhoto({required String customerId});
 
   Future<void> deleteCustomer(String id);
 
@@ -32,6 +34,4 @@ abstract class CustomerRepository {
     required double saleAmount,
     required DateTime purchaseDate,
   });
-
-  Future<void> deleteCustomerPhoto({required String customerId});
 }
