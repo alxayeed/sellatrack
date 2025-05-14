@@ -21,33 +21,66 @@ class ProfileScreen extends ConsumerWidget {
         children: [
           Icon(icon, color: theme.colorScheme.primary, size: 24),
           const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value ?? 'Not set',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 2),
+                Text(
+                  value ?? 'Not set',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
+  void _showSignOutConfirmationDialog(BuildContext context, WidgetRef ref) {
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('Sign Out'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                authNotifier.signOut();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    final authNotifier = ref.read(authNotifierProvider.notifier);
     final theme = Theme.of(context);
 
     ref.listen<AuthScreenState>(authNotifierProvider, (previous, next) {
@@ -68,27 +101,19 @@ class ProfileScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_outlined),
-            tooltip: 'Sign Out',
-            onPressed: () {
-              authNotifier.signOut();
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('My Profile'), centerTitle: true),
       body: RefreshIndicator(
-        onRefresh: () => authNotifier.checkCurrentUser(),
+        onRefresh:
+            () => ref.read(authNotifierProvider.notifier).checkCurrentUser(),
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: <Widget>[
             if (authState.status == AuthStatus.loading &&
                 authState.user == null)
-              const Center(child: CircularProgressIndicator())
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: const Center(child: CircularProgressIndicator()),
+              )
             else if (authState.user != null) ...[
               Center(
                 child: Column(
@@ -97,16 +122,18 @@ class ProfileScreen extends ConsumerWidget {
                       radius: 50,
                       backgroundColor: theme.colorScheme.primaryContainer,
                       backgroundImage:
-                          authState.user!.photoURL != null
+                          authState.user!.photoURL != null &&
+                                  authState.user!.photoURL!.isNotEmpty
                               ? NetworkImage(authState.user!.photoURL!)
                               : null,
                       child:
-                          authState.user!.photoURL == null
+                          (authState.user!.photoURL == null ||
+                                  authState.user!.photoURL!.isEmpty)
                               ? Text(
                                 authState.user!.displayName?.isNotEmpty == true
                                     ? authState.user!.displayName![0]
                                         .toUpperCase()
-                                    : 'S',
+                                    : 'U',
                                 style: theme.textTheme.headlineLarge?.copyWith(
                                   color: theme.colorScheme.onPrimaryContainer,
                                 ),
@@ -119,13 +146,16 @@ class ProfileScreen extends ConsumerWidget {
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    if (authState.user!.email != null)
+                    if (authState.user!.email != null &&
+                        authState.user!.email!.isNotEmpty)
                       Text(
                         authState.user!.email!,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.outline,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                   ],
                 ),
@@ -138,14 +168,16 @@ class ProfileScreen extends ConsumerWidget {
                 'Full Name',
                 authState.user!.displayName,
               ),
-              if (authState.user!.email != null)
+              if (authState.user!.email != null &&
+                  authState.user!.email!.isNotEmpty)
                 _buildProfileDetailRow(
                   context,
                   Icons.email_outlined,
                   'Email Address',
                   authState.user!.email,
                 ),
-              if (authState.user!.phoneNumber != null)
+              if (authState.user!.phoneNumber != null &&
+                  authState.user!.phoneNumber!.isNotEmpty)
                 _buildProfileDetailRow(
                   context,
                   Icons.phone_outlined,
@@ -154,7 +186,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               _buildProfileDetailRow(
                 context,
-                Icons.vpn_key_outlined,
+                Icons.badge_outlined,
                 'User ID',
                 authState.user!.uid,
               ),
@@ -164,6 +196,7 @@ class ProfileScreen extends ConsumerWidget {
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('Edit Profile'),
                 style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   backgroundColor: theme.colorScheme.secondaryContainer,
                   foregroundColor: theme.colorScheme.onSecondaryContainer,
@@ -175,13 +208,33 @@ class ProfileScreen extends ConsumerWidget {
                   context.goNamed(AppRoutePaths.updateProfileNamed);
                 },
               ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.logout_outlined),
+                label: const Text('Sign Out'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: theme.colorScheme.errorContainer,
+                  foregroundColor: theme.colorScheme.onErrorContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  _showSignOutConfirmationDialog(context, ref);
+                },
+              ),
             ] else
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Text(
-                    'User information not available. Please try logging in again.',
-                    textAlign: TextAlign.center,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Text(
+                      'User information not available. Please try logging in again.',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),

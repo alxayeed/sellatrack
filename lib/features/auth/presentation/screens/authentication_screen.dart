@@ -79,7 +79,7 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
       if (next.status == AuthStatus.profileIncomplete) {
         context.go(AppRoutePaths.profileCompletion);
       } else if (next.status == AuthStatus.authenticated) {
-        context.go(AppRoutePaths.profile);
+        context.go(AppRoutePaths.sales);
       }
       if (next.errorMessage != null &&
           next.errorMessage!.isNotEmpty &&
