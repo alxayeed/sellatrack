@@ -5,6 +5,7 @@ import 'package:sellatrack/features/auth/presentation/screens/authentication_scr
 import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/update_profile_screen.dart';
+import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
 
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
 import 'router_listenable.dart';
@@ -17,6 +18,7 @@ class AppRoutePaths {
   static const String updateProfileSubPath = 'edit';
   static const String updateProfileNamed = 'update-profile';
   static const String sales = '/sales';
+  static const String customers = '/customers';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -24,8 +26,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
+    // Always start at splash
     debugLogDiagnostics: true,
-    // refreshListenable: routerListener,
+    refreshListenable: routerListener,
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutePaths.splash,
@@ -67,41 +70,45 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return const SaleListScreen();
         },
       ),
+      GoRoute(
+        path: AppRoutePaths.customers,
+        builder: (BuildContext context, GoRouterState state) {
+          return const CustomerListScreen();
+        },
+      ),
     ],
     redirect: (BuildContext context, GoRouterState state) {
-      if (!routerListener.initialCheckDone) {
-        return AppRoutePaths.splash;
+      final bool isInitialized = routerListener.initialAuthCheckDone;
+      final bool isLoggedIn = routerListener.isLoggedIn;
+      final String intendedLocation = state.matchedLocation;
+
+      // If not initialized yet, stay on splash.
+      if (!isInitialized) {
+        return (intendedLocation == AppRoutePaths.splash)
+            ? null
+            : AppRoutePaths.splash;
       }
 
-      final bool isLoggedIn = routerListener.isLoggedIn;
-      final bool isProfileComplete = routerListener.isProfileComplete;
-      final String currentLocation = state.matchedLocation;
-
-      final bool isOnAuthScreen =
-          currentLocation == AppRoutePaths.authentication;
-      final bool isOnProfileCompletion =
-          currentLocation == AppRoutePaths.profileCompletion;
-      final bool isOnSplash = currentLocation == AppRoutePaths.splash;
-
-      if (!isLoggedIn) {
-        // if (isOnAuthScreen || isOnSplash) {
-        //   return null;
-        // }
-        return AppRoutePaths.authentication;
-      } else {
-        if (!isProfileComplete) {
-          if (isOnProfileCompletion || isOnAuthScreen || isOnSplash) {
-            return null;
-          }
-          return AppRoutePaths.profileCompletion;
-        } else {
-          if (currentLocation == AppRoutePaths.profile) {
-            return AppRoutePaths.profile;
-          }
+      // If initialized and logged in:
+      if (isLoggedIn) {
+        // If they are trying to go to auth screen, or are on splash, redirect to sales.
+        if (intendedLocation == AppRoutePaths.authentication ||
+            intendedLocation == AppRoutePaths.splash) {
           return AppRoutePaths.sales;
         }
+        // Otherwise, let them go where they intended (e.g., /sales, /profile, /customers)
+        return null;
       }
-      return null;
+      // If initialized and NOT logged in:
+      else {
+        // If they are not already on the auth screen or splash, redirect to auth.
+        if (intendedLocation != AppRoutePaths.authentication &&
+            intendedLocation != AppRoutePaths.splash) {
+          return AppRoutePaths.authentication;
+        }
+        // Otherwise, let them stay on auth or splash
+        return null;
+      }
     },
   );
 });
