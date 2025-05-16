@@ -1,0 +1,7 @@
+Release 2
+- Customer List
+- Add Customer
+- Edit Customer
+- Customer Details
+- Better error handling
+- Custom snackbar and widgets
