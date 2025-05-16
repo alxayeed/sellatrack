@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Auth Feature Specific Imports
 import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource.dart';
 import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource_impl.dart';
 import 'package:sellatrack/features/auth/data/repositories/auth_repository_impl.dart';
@@ -13,9 +12,15 @@ import 'package:sellatrack/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/sign_up_with_email_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/update_user_profile_usecase.dart';
 
+import '../errors/error_handler_service.dart';
+
 // --- CORE SERVICE PROVIDERS ---
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
+});
+
+final errorHandlerServiceProvider = Provider<ErrorHandlerService>((ref) {
+  return ErrorHandlerService();
 });
 
 // --- AUTH FEATURE DATASOURCE PROVIDERS ---
@@ -80,5 +85,3 @@ final authStateChangesProvider = StreamProvider<AuthUserEntity?>((ref) {
   final getAuthStateChanges = ref.watch(getAuthStateChangesUseCaseProvider);
   return getAuthStateChanges.call();
 });
-
-// --- Other feature providers would go below, or in separate files within core/di/ ---
