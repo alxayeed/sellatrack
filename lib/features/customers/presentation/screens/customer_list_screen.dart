@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sellatrack/core/widgets/empty_list_widget.dart';
 import 'package:sellatrack/core/widgets/error_display_widget.dart';
 import 'package:sellatrack/core/widgets/loading_indicator_widget.dart';
@@ -8,6 +9,7 @@ import 'package:sellatrack/features/customers/presentation/notifiers/customer_li
 import 'package:sellatrack/features/customers/presentation/providers/customer_providers.dart';
 import 'package:sellatrack/features/customers/presentation/widgets/customer_list_item_widget.dart';
 
+import '../../../../core/navigation/app_router.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 
 class CustomerListScreen extends ConsumerStatefulWidget {
@@ -95,8 +97,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Navigate to Add Customer Screen
-          // context.go(AppRoutePaths.addCustomer);
+          context.push(AppRoutePaths.addCustomer);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Add Customer - Coming Soon!')),
           );

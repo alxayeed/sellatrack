@@ -7,6 +7,7 @@ import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dar
 import 'package:sellatrack/features/auth/presentation/screens/update_profile_screen.dart';
 import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
 
+import '../../features/customers/presentation/screens/add_customer_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
 import 'router_listenable.dart';
 
@@ -19,6 +20,7 @@ class AppRoutePaths {
   static const String updateProfileNamed = 'update-profile';
   static const String sales = '/sales';
   static const String customers = '/customers';
+  static const String addCustomer = '/customers/add';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -75,6 +77,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) {
           return const CustomerListScreen();
         },
+        routes: <RouteBase>[
+          GoRoute(
+            path: 'add',
+            name: AppRoutePaths.addCustomer,
+            builder: (BuildContext context, GoRouterState state) {
+              return const AddCustomerScreen();
+            },
+          ),
+        ],
       ),
     ],
     redirect: (BuildContext context, GoRouterState state) {
