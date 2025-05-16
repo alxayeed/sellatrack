@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:sellatrack/core/errors/failures.dart';
 import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
 import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
 
@@ -6,9 +8,9 @@ class GetCustomerByIdUseCase {
 
   GetCustomerByIdUseCase(this.repository);
 
-  Future<CustomerEntity?> call(String id) async {
+  Future<Either<Failure, CustomerEntity?>> call(String id) async {
     if (id.isEmpty) {
-      throw ArgumentError('Customer ID cannot be empty.');
+      return Left(InvalidInputFailure(message: 'Customer ID cannot be empty.'));
     }
     return repository.getCustomerById(id);
   }

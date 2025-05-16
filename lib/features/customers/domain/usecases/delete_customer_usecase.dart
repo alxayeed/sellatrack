@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:sellatrack/core/errors/failures.dart';
 import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
 
 class DeleteCustomerUseCase {
@@ -5,9 +7,9 @@ class DeleteCustomerUseCase {
 
   DeleteCustomerUseCase(this.repository);
 
-  Future<void> call(String id) async {
+  Future<Either<Failure, void>> call(String id) async {
     if (id.isEmpty) {
-      throw ArgumentError('Customer ID cannot be empty.');
+      return Left(InvalidInputFailure(message: 'Customer ID cannot be empty.'));
     }
     return repository.deleteCustomer(id);
   }

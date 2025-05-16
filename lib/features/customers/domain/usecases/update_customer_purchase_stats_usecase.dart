@@ -1,20 +1,29 @@
-import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:sellatrack/core/errors/failures.dart';
 import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
 
-class UpdateCustomerUseCase {
+class UpdateCustomerPurchaseStatsUseCase {
   final CustomerRepository repository;
 
-  UpdateCustomerUseCase(this.repository);
+  UpdateCustomerPurchaseStatsUseCase(this.repository);
 
-  Future<void> call(CustomerEntity customerData) async {
-    if (customerData.id.isEmpty) {
-      throw ArgumentError('Customer ID is required for an update.');
+  Future<Either<Failure, void>> call({
+    required String customerId,
+    required double saleAmount,
+    required DateTime purchaseDate,
+  }) async {
+    if (customerId.isEmpty) {
+      return Left(InvalidInputFailure(message: 'Customer ID cannot be empty.'));
     }
-    if (customerData.name.isEmpty ||
-        customerData.phoneNumber.isEmpty ||
-        customerData.address.isEmpty) {
-      throw ArgumentError('Name, phone number, and address cannot be empty.');
+    if (saleAmount < 0) {
+      return Left(
+        InvalidInputFailure(message: 'Sale amount cannot be negative.'),
+      );
     }
-    return repository.updateCustomer(customerData);
+    return repository.updateCustomerPurchaseStats(
+      customerId: customerId,
+      saleAmount: saleAmount,
+      purchaseDate: purchaseDate,
+    );
   }
 }

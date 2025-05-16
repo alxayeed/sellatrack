@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:sellatrack/core/errors/failures.dart';
 import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
 import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
 
@@ -6,9 +8,11 @@ class FindCustomerByPhoneNumberUseCase {
 
   FindCustomerByPhoneNumberUseCase(this.repository);
 
-  Future<CustomerEntity?> call(String phoneNumber) async {
+  Future<Either<Failure, CustomerEntity?>> call(String phoneNumber) async {
     if (phoneNumber.isEmpty) {
-      throw ArgumentError('Phone number cannot be empty.');
+      return Left(
+        InvalidInputFailure(message: 'Phone number cannot be empty.'),
+      );
     }
     return repository.findCustomerByPhoneNumber(phoneNumber);
   }
