@@ -151,14 +151,9 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
             return CustomerListItemWidget(
               customer: customer,
               onTap: () {
-                // TODO: Navigate to Customer Detail Screen
-                // context.go('${AppRoutePaths.customerDetail}/${customer.id}');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'View details for ${customer.name} - Coming Soon!',
-                    ),
-                  ),
+                context.push(
+                  '${AppRoutePaths.customers}/detail/${customer.id}',
+                  extra: customer,
                 );
               },
               // onDelete: () => customerNotifier.deleteCustomer(customer.id), // Example

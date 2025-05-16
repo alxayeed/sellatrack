@@ -22,8 +22,7 @@ class AppSnackBar {
       ),
       duration: duration,
       backgroundColor:
-          backgroundColor ??
-          Theme.of(context).colorScheme.secondaryContainer, // Default color
+          backgroundColor ?? Theme.of(context).colorScheme.onPrimaryFixed,
       behavior: SnackBarBehavior.floating,
       // margin: const EdgeInsets.all(10),
       // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -54,7 +53,7 @@ class AppSnackBar {
     show(
       context,
       message: message,
-      backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+      backgroundColor: Theme.of(context).colorScheme.onPrimaryFixed,
       icon: Icons.info_outline,
     );
   }

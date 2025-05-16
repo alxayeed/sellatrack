@@ -5,9 +5,12 @@ import 'package:sellatrack/features/auth/presentation/screens/authentication_scr
 import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/update_profile_screen.dart';
+import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
+import 'package:sellatrack/features/customers/presentation/screens/add_customer_screen.dart';
+import 'package:sellatrack/features/customers/presentation/screens/customer_detail_screen.dart';
 import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
+import 'package:sellatrack/features/customers/presentation/screens/edit_customer_screen.dart'; // Import EditCustomerScreen
 
-import '../../features/customers/presentation/screens/add_customer_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
 import 'router_listenable.dart';
 
@@ -20,7 +23,12 @@ class AppRoutePaths {
   static const String updateProfileNamed = 'update-profile';
   static const String sales = '/sales';
   static const String customers = '/customers';
-  static const String addCustomer = '/customers/add';
+  static const String addCustomer = 'add';
+  static const String customerDetail = 'detail/:customerId';
+  static const String customerDetailNamed = 'customer-detail';
+  static const String editCustomer =
+      'edit/:customerId'; // Path for editing a specific customer
+  static const String editCustomerNamed = 'edit-customer';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -28,7 +36,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
-    // Always start at splash
     debugLogDiagnostics: true,
     refreshListenable: routerListener,
     routes: <RouteBase>[
@@ -79,11 +86,48 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
         routes: <RouteBase>[
           GoRoute(
-            path: 'add',
+            path: AppRoutePaths.addCustomer,
             name: AppRoutePaths.addCustomer,
             builder: (BuildContext context, GoRouterState state) {
               return const AddCustomerScreen();
             },
+          ),
+          GoRoute(
+            path: AppRoutePaths.customerDetail,
+            name: AppRoutePaths.customerDetailNamed,
+            builder: (BuildContext context, GoRouterState state) {
+              final customer = state.extra as CustomerEntity?;
+              if (customer != null) {
+                return CustomerDetailScreen(customer: customer);
+              }
+              return const Scaffold(
+                body: Center(child: Text('Customer not found')),
+              );
+            },
+            routes: <RouteBase>[
+              // Edit as a sub-route of detail
+              GoRoute(
+                path: AppRoutePaths.updateProfileSubPath, // 'edit'
+                name: AppRoutePaths.editCustomerNamed, // 'edit-customer'
+                builder: (BuildContext context, GoRouterState state) {
+                  final customerToEdit = state.extra as CustomerEntity?;
+                  if (customerToEdit != null) {
+                    return EditCustomerScreen(customerToEdit: customerToEdit);
+                  }
+                  // Fallback if not passed via extra, or if detail screen didn't pass it
+                  // Ideally, the detail screen would fetch its customer, then pass that customer object
+                  // as 'extra' when navigating to its own edit sub-route.
+                  // Or, EditCustomerScreen would take customerId from pathParameters of its parent
+                  // and fetch data itself.
+                  // For now, we rely on 'extra' from the detail screen's navigation to edit.
+                  return const Scaffold(
+                    body: Center(
+                      child: Text('Customer to edit not found via extra.'),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -92,13 +136,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final bool isInitialized = routerListener.initialAuthCheckDone;
       final bool isLoggedIn = routerListener.isLoggedIn;
       final String intendedLocation = state.matchedLocation;
-
-      // If not initialized yet, stay on splash.
-      if (!isInitialized) {
-        return (intendedLocation == AppRoutePaths.splash)
-            ? null
-            : AppRoutePaths.splash;
-      }
 
       // If initialized and logged in:
       if (isLoggedIn) {

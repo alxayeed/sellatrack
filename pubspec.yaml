@@ -18,6 +18,7 @@ dependencies:
   dartz: ^0.10.1
   talker_flutter: ^4.7.6
   talker_riverpod_logger: ^4.7.6
+  intl: ^0.20.2
 
 
 dev_dependencies:
