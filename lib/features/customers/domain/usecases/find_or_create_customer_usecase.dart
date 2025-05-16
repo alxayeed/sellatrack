@@ -3,17 +3,37 @@ import 'package:sellatrack/core/errors/failures.dart';
 import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
 import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
 
-class FindCustomerByPhoneNumberUseCase {
+class FindOrCreateCustomerUseCase {
   final CustomerRepository repository;
 
-  FindCustomerByPhoneNumberUseCase(this.repository);
+  FindOrCreateCustomerUseCase(this.repository);
 
-  Future<Either<Failure, CustomerEntity?>> call(String phoneNumber) async {
-    if (phoneNumber.isEmpty) {
+  Future<Either<Failure, CustomerEntity>> call({
+    required String name,
+    required String phoneNumber,
+    required String address,
+    String? email,
+    String? photoUrl,
+    required String recordedByUid,
+  }) async {
+    if (name.isEmpty ||
+        phoneNumber.isEmpty ||
+        address.isEmpty ||
+        recordedByUid.isEmpty) {
       return Left(
-        InvalidInputFailure(message: 'Phone number cannot be empty.'),
+        InvalidInputFailure(
+          message:
+              'Name, phone number, address, and recordedBy UID are required.',
+        ),
       );
     }
-    return repository.findCustomerByPhoneNumber(phoneNumber);
+    return repository.findOrCreateCustomer(
+      name: name,
+      phoneNumber: phoneNumber,
+      address: address,
+      email: email,
+      photoUrl: photoUrl,
+      recordedByUid: recordedByUid,
+    );
   }
 }
