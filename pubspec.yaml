@@ -19,6 +19,8 @@ dependencies:
   talker_flutter: ^4.7.6
   talker_riverpod_logger: ^4.7.6
   intl: ^0.20.2
+  google_fonts: ^6.2.1
+  flutter_screenutil: ^5.9.3
 
 
 dev_dependencies:

@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/navigation/app_router.dart'; // For AppRoutePaths
+import 'package:sellatrack/core/navigation/app_router.dart';
+
+import '../constants/app_colors.dart';
+import '../styles/app_text_styles.dart'; // For AppRoutePaths
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,18 +31,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text(
-              'SellaTrack',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Icon(
+              Icons.storefront_outlined,
+              size: 80,
+              color: AppColors.primaryDarker,
             ),
-            Text('Loading...'),
+            SizedBox(height: 24),
+            Text('SellaTrack', style: AppTextStyles.headlineLarge),
           ],
         ),
       ),
