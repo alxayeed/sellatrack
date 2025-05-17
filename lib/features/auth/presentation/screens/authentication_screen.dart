@@ -46,7 +46,7 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
 
     if (authUser != null) {
       if (authUser.displayName != null && authUser.displayName!.isNotEmpty) {
-        if (mounted) context.go(AppRoutePaths.sales);
+        if (mounted) context.go(AppRoutePaths.home);
       } else {
         if (mounted) context.go(AppRoutePaths.profileCompletion);
       }
@@ -130,7 +130,7 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
       if (next.status == AuthStatus.profileIncomplete) {
         if (mounted) context.go(AppRoutePaths.profileCompletion);
       } else if (next.status == AuthStatus.authenticated) {
-        if (mounted) context.go(AppRoutePaths.sales);
+        if (mounted) context.go(AppRoutePaths.home);
       }
 
       if (next.errorMessage != null &&

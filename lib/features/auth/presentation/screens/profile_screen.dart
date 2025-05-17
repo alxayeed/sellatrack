@@ -5,6 +5,9 @@ import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/auth/presentation/notifiers/auth_state.dart';
 import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
 
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/app_layout/custom_app_bar.dart';
+
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -101,7 +104,7 @@ class ProfileScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Profile'), centerTitle: true),
+      appBar: CustomAppBar(title: AppStrings.myProfileTitle, actions: []),
       body: RefreshIndicator(
         onRefresh:
             () => ref.read(authNotifierProvider.notifier).checkCurrentUser(),
@@ -205,7 +208,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 onPressed: () {
-                  context.goNamed(AppRoutePaths.updateProfileNamed);
+                  context.goNamed(AppRoutePaths.updateAuthProfileNamed);
                 },
               ),
               const SizedBox(height: 12),

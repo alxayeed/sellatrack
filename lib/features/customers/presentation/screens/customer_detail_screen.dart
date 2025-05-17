@@ -104,7 +104,7 @@ class CustomerDetailScreen extends ConsumerWidget {
               // context.goNamed(AppRoutePaths.editCustomerNamed, extra: customer);
               // Or, if using the path directly and editCustomer is a sub-route of customerDetail
               context.go(
-                '${AppRoutePaths.customers}/${AppRoutePaths.customerDetail.split('/:').first}/${customer.id}/${AppRoutePaths.updateProfileSubPath}', // Assumes 'edit' is the subpath
+                '${GoRouterState.of(context).uri.toString()}/${AppRoutePaths.editCustomerSubPath}',
                 extra: customer,
               );
             },

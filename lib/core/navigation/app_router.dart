@@ -1,100 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sellatrack/core/widgets/screens/home_screen.dart';
+import 'package:sellatrack/core/widgets/screens/splash_screen.dart';
+import 'package:sellatrack/core/widgets/screens/widget_library_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/authentication_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
-import 'package:sellatrack/features/auth/presentation/screens/update_profile_screen.dart';
-import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
-import 'package:sellatrack/features/customers/presentation/screens/add_customer_screen.dart';
-import 'package:sellatrack/features/customers/presentation/screens/customer_detail_screen.dart';
 import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
-import 'package:sellatrack/features/customers/presentation/screens/edit_customer_screen.dart'; // Import EditCustomerScreen
 
+import '../../features/customers/domain/entities/customer_entity.dart';
+import '../../features/customers/presentation/screens/add_customer_screen.dart';
+import '../../features/customers/presentation/screens/customer_detail_screen.dart';
+import '../../features/customers/presentation/screens/edit_customer_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
-import '../widgets/screens/splash_screen.dart';
-import '../widgets/screens/widget_library_screen.dart';
+import '../widgets/screens/main_screen.dart';
 import 'router_listenable.dart';
+
+class StocksScreen extends StatelessWidget {
+  const StocksScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      appBar: null,
+      body: Center(child: Text('Stocks Screen - Coming Soon!')),
+    );
+  }
+}
 
 class AppRoutePaths {
   static const String splash = '/';
   static const String authentication = '/auth';
+  static const String home = '/home';
   static const String profileCompletion = '/complete-profile';
-  static const String profile = '/profile';
-  static const String updateProfileSubPath = 'edit';
-  static const String updateProfileNamed = 'update-profile';
-  static const String sales = '/sales';
-  static const String customers = '/customers';
-  static const String addCustomer = 'add';
-  static const String customerDetail = 'detail/:customerId';
-  static const String customerDetailNamed = 'customer-detail';
-  static const String editCustomer =
-      'edit/:customerId'; // Path for editing a specific customer
-  static const String editCustomerNamed = 'edit-customer';
+  static const String widgetLibrary =
+      '/dev/widget-library'; // Made path more distinct
 
-  static const String widgetLibrary = '/widget-library';
+  static const String sales = '/sales';
+  static const String stocks = '/stocks';
+  static const String customers =
+      '/customers'; // Top-level path for customers feature
+  static const String profile = '/profile';
+
+  static const String updateAuthProfileSubPath = 'edit-auth-profile';
+  static const String updateAuthProfileNamed = 'update-auth-profile';
+
+  static const String addCustomer = 'add'; // Sub-path relative to /customers
+  static const String customerDetail =
+      'detail/:customerId'; // Sub-path relative to /customers
+  static const String customerDetailNamed =
+      'customer-detail'; // Name for a specific customer detail view
+  static const String editCustomerSubPath =
+      'edit'; // Sub-path relative to /customers/detail/:customerId
+  static const String editCustomerNamed = 'edit-customer-profile';
 }
 
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+final GlobalKey<NavigatorState> _shellNavigatorKeySales =
+    GlobalKey<NavigatorState>(debugLabel: 'shellSales');
+final GlobalKey<NavigatorState> _shellNavigatorKeyStocks =
+    GlobalKey<NavigatorState>(debugLabel: 'shellStocks');
+final GlobalKey<NavigatorState> _shellNavigatorKeyCustomers = // New Key
+    GlobalKey<NavigatorState>(debugLabel: 'shellCustomers');
+final GlobalKey<NavigatorState> _shellNavigatorKeyProfile =
+    GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  ref.watch(routerListenableProvider);
+  final routerListener = ref.watch(routerListenableProvider);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutePaths.splash,
     debugLogDiagnostics: true,
-    // refreshListenable: routerListener,
+    refreshListenable: routerListener,
+    // Assuming you want reactive redirects
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutePaths.splash,
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        path: AppRoutePaths.widgetLibrary, // For dev purposes
+        builder: (context, state) => const WidgetLibraryScreen(),
+      ),
+      GoRoute(
         path: AppRoutePaths.authentication,
-        builder: (BuildContext context, GoRouterState state) {
-          return const AuthenticationScreen();
-        },
+        builder:
+            (BuildContext context, GoRouterState state) =>
+                const AuthenticationScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.profileCompletion,
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileCompletionScreen();
-        },
+        builder:
+            (BuildContext context, GoRouterState state) =>
+                const ProfileCompletionScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.profile,
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileScreen();
-        },
-        routes: <RouteBase>[
-          GoRoute(
-            path: AppRoutePaths.updateProfileSubPath,
-            name: AppRoutePaths.updateProfileNamed,
-            builder: (BuildContext context, GoRouterState state) {
-              return const UpdateProfileScreen();
-            },
-          ),
-        ],
+        builder:
+            (BuildContext context, GoRouterState state) =>
+                const ProfileScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.sales,
-        builder: (BuildContext context, GoRouterState state) {
-          return const SaleListScreen();
-        },
-      ),
-      GoRoute(
-        path: AppRoutePaths.customers,
-        builder: (BuildContext context, GoRouterState state) {
-          return const CustomerListScreen();
-        },
+        path: AppRoutePaths.customers, // Top level path for the branch
+        builder:
+            (BuildContext context, GoRouterState state) =>
+                const CustomerListScreen(),
         routes: <RouteBase>[
           GoRoute(
-            path: AppRoutePaths.addCustomer,
-            name: AppRoutePaths.addCustomer,
-            builder: (BuildContext context, GoRouterState state) {
-              return const AddCustomerScreen();
-            },
+            path: AppRoutePaths.addCustomer, // 'add'
+            name: 'customers_add_customer', // Unique name
+            builder:
+                (BuildContext context, GoRouterState state) =>
+                    const AddCustomerScreen(),
           ),
           GoRoute(
             path: AppRoutePaths.customerDetail,
+            // 'detail/:customerId'
             name: AppRoutePaths.customerDetailNamed,
             builder: (BuildContext context, GoRouterState state) {
               final customer = state.extra as CustomerEntity?;
@@ -106,19 +131,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               );
             },
             routes: <RouteBase>[
-              // Edit as a sub-route of detail
               GoRoute(
-                path: AppRoutePaths.updateProfileSubPath, // 'edit'
-                name: AppRoutePaths.editCustomerNamed, // 'edit-customer'
+                path: AppRoutePaths.editCustomerSubPath, // 'edit'
+                name: AppRoutePaths.editCustomerNamed,
                 builder: (BuildContext context, GoRouterState state) {
                   final customerToEdit = state.extra as CustomerEntity?;
                   if (customerToEdit != null) {
                     return EditCustomerScreen(customerToEdit: customerToEdit);
                   }
                   return const Scaffold(
-                    body: Center(
-                      child: Text('Customer to edit not found via extra.'),
-                    ),
+                    body: Center(child: Text('Customer to edit not found.')),
                   );
                 },
               ),
@@ -126,36 +148,93 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(
-        path: AppRoutePaths.widgetLibrary,
-        builder: (context, state) => const WidgetLibraryScreen(),
+
+      // GoRoute(
+      //   path: AppRoutePaths.customers,
+      //   builder:
+      //       (BuildContext context, GoRouterState state) =>
+      //           const CustomerListScreen(),
+      // ),
+      StatefulShellRoute.indexedStack(
+        builder: (
+          BuildContext context,
+          GoRouterState state,
+          StatefulNavigationShell navigationShell,
+        ) {
+          return MainScreen(navigationShell: navigationShell);
+        },
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorKeySales,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutePaths.sales,
+                builder:
+                    (BuildContext context, GoRouterState state) =>
+                        const SaleListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorKeyProfile,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutePaths.home,
+                builder:
+                    (BuildContext context, GoRouterState state) =>
+                        const HomeScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorKeyStocks,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutePaths.stocks,
+                builder:
+                    (BuildContext context, GoRouterState state) =>
+                        const StocksScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
     // redirect: (BuildContext context, GoRouterState state) {
-    //   final bool isInitialized = routerListener.initialAuthCheckDone;
-    //   final bool isLoggedIn = routerListener.isLoggedIn;
-    //   final String intendedLocation = state.matchedLocation;
+    //   if (!routerListener.initialCheckDone) {
+    //     return AppRoutePaths.splash;
+    //   }
     //
-    //   // If initialized and logged in:
-    //   if (isLoggedIn) {
-    //     // If they are trying to go to auth screen, or are on splash, redirect to sales.
-    //     if (intendedLocation == AppRoutePaths.authentication ||
-    //         intendedLocation == AppRoutePaths.splash) {
-    //       return AppRoutePaths.sales;
-    //     }
-    //     // Otherwise, let them go where they intended (e.g., /sales, /profile, /customers)
-    //     return null;
+    //   final bool isLoggedIn = routerListener.isLoggedIn;
+    //   final bool isProfileComplete = routerListener.isProfileComplete;
+    //   final String intendedPath = state.uri.toString();
+    //
+    //   final authFlowPaths = [
+    //     AppRoutePaths.splash,
+    //     AppRoutePaths.authentication,
+    //     AppRoutePaths.profileCompletion,
+    //   ];
+    //   final bool isOnAuthFlowPath = authFlowPaths.contains(intendedPath.split('?').first);
+    //
+    //
+    //   if (!isLoggedIn) {
+    //     return isOnAuthFlowPath ? null : AppRoutePaths.authentication;
     //   }
-    //   // If initialized and NOT logged in:
-    //   else {
-    //     // If they are not already on the auth screen or splash, redirect to auth.
-    //     if (intendedLocation != AppRoutePaths.authentication &&
-    //         intendedLocation != AppRoutePaths.splash) {
-    //       return AppRoutePaths.authentication;
-    //     }
-    //     // Otherwise, let them stay on auth or splash
-    //     return null;
+    //
+    //   if (!isProfileComplete) {
+    //     return intendedPath == AppRoutePaths.profileCompletion ||
+    //         intendedPath == AppRoutePaths.authentication ||
+    //         intendedPath == AppRoutePaths.splash
+    //         ? null
+    //         : AppRoutePaths.profileCompletion;
     //   }
+    //
+    //   if (isOnAuthFlowPath) {
+    //     return AppRoutePaths.sales;
+    //   }
+    //
+    //   return null;
     // },
   );
 });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sellatrack/core/widgets/app_layout/custom_app_bar.dart';
 import 'package:sellatrack/core/widgets/empty_list_widget.dart';
 import 'package:sellatrack/core/widgets/error_display_widget.dart';
 import 'package:sellatrack/core/widgets/loading_indicator_widget.dart';
@@ -10,6 +11,7 @@ import 'package:sellatrack/features/customers/presentation/providers/customer_pr
 import 'package:sellatrack/features/customers/presentation/widgets/customer_list_item_widget.dart';
 
 import '../../../../core/navigation/app_router.dart';
+import '../../../../core/widgets/app_layout/app_drawer_widget.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 
 class CustomerListScreen extends ConsumerStatefulWidget {
@@ -63,31 +65,9 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Customers'),
-        centerTitle: true,
-        // Optional: Add search functionality later
-        // bottom: PreferredSize(
-        //   preferredSize: const Size.fromHeight(kToolbarHeight),
-        //   child: Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        //     child: TextField(
-        //       controller: _searchController,
-        //       decoration: InputDecoration(
-        //         hintText: 'Search customers...',
-        //         prefixIcon: Icon(Icons.search),
-        //         border: OutlineInputBorder(
-        //           borderRadius: BorderRadius.circular(8.0),
-        //           borderSide: BorderSide.none,
-        //         ),
-        //         filled: true,
-        //         contentPadding: EdgeInsets.symmetric(vertical: 0),
-        //       ),
-        //       onChanged: _onSearchChanged, // Or use a debounce
-        //     ),
-        //   ),
-        // ),
-      ),
+      appBar: CustomAppBar(title: "Customers"),
+      drawer: const AppDrawerWidget(),
+
       body: RefreshIndicator(
         onRefresh:
             () => customerNotifier.fetchCustomers(
@@ -97,10 +77,11 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          context.push(AppRoutePaths.addCustomer);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add Customer - Coming Soon!')),
-          );
+          context.pushNamed(
+            'customers_add_customer',
+          ); // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(content: Text('Add Customer - Coming Soon!')),
+          // );
         },
         icon: const Icon(Icons.add),
         label: const Text('Add Customer'),

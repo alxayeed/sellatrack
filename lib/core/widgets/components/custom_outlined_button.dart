@@ -105,8 +105,9 @@ class CustomOutlinedButton extends StatelessWidget {
         );
       }
       if (trailingIcon != null) {
-        if (text.isNotEmpty || leadingIcon != null)
+        if (text.isNotEmpty || leadingIcon != null) {
           children.add(SizedBox(width: 8.w));
+        }
         children.add(trailingIcon!);
       }
       buttonChild = Row(mainAxisSize: MainAxisSize.min, children: children);

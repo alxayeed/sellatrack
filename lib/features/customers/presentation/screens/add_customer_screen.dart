@@ -108,8 +108,9 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return 'Please enter customer name';
+                  }
                   if (value.length < 2) return 'Name too short';
                   return null;
                 },
@@ -128,10 +129,12 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                 keyboardType: TextInputType.phone,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return 'Please enter contact number';
-                  if (value.length < 10)
+                  }
+                  if (value.length < 10) {
                     return 'Invalid contact number'; // Basic check
+                  }
                   return null;
                 },
               ),
@@ -148,8 +151,9 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                 textCapitalization: TextCapitalization.words,
                 maxLines: 2,
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return 'Please enter address';
+                  }
                   return null;
                 },
               ),

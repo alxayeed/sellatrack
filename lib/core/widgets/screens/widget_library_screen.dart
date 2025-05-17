@@ -20,7 +20,7 @@ class WidgetLibraryScreen extends StatefulWidget {
 }
 
 class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
-  bool _isLoading = false;
+  bool _buttonsLoading = false;
   bool _fieldsEnabled = true;
   String? _selectedDropdownValue;
   DateTime? _selectedDate;
@@ -40,57 +40,53 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Widget Library'),
-        centerTitle: true,
-        actions: [
-          const Text("Load"),
-          Switch(
-            value: _isLoading,
-            onChanged: (value) {
-              setState(() {
-                _isLoading = value;
-              });
-            },
-            activeColor: theme.colorScheme.primary,
-          ),
-          const Text("Enable"),
-          Switch(
-            value: _fieldsEnabled,
-            onChanged: (value) {
-              setState(() {
-                _fieldsEnabled = value;
-              });
-            },
-          ),
-          SizedBox(width: 8.w),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Widget Library'), centerTitle: true),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _buildSectionTitle(context, 'Buttons'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildSectionTitle(context, 'Buttons'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Text("Loading State:"),
+                    Switch(
+                      value: _buttonsLoading,
+                      onChanged: (value) {
+                        setState(() {
+                          _buttonsLoading = value;
+                        });
+                      },
+                      activeColor: theme.colorScheme.primary,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
             _buildSectionTitle(context, 'CustomElevatedButton', isSub: true),
             _buildButtonRow([
               CustomElevatedButton(
                 onPressed: () {},
                 text: 'Small',
                 size: ButtonSize.small,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomElevatedButton(
                 onPressed: () {},
                 text: 'Medium',
                 size: ButtonSize.medium,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomElevatedButton(
                 onPressed: () {},
                 text: 'Large',
                 size: ButtonSize.large,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
             SizedBox(height: 8.h),
@@ -99,13 +95,13 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 onPressed: () {},
                 text: 'Secondary',
                 type: ButtonType.secondary,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomElevatedButton(
                 onPressed: () {},
                 text: 'Destructive',
                 type: ButtonType.destructive,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
             SizedBox(height: 8.h),
@@ -113,8 +109,16 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
               onPressed: () {},
               text: 'Expanded Icon',
               expand: true,
-              isLoading: _isLoading,
+              isLoading: _buttonsLoading,
               leadingIcon: Icon(Icons.add, size: 18.sp),
+            ),
+            SizedBox(height: 8.h),
+            CustomElevatedButton(
+              onPressed: () {},
+              text: 'With Icons',
+              isLoading: _buttonsLoading,
+              leadingIcon: Icon(Icons.star_border, size: 18.sp),
+              trailingIcon: Icon(Icons.arrow_forward_ios, size: 16.sp),
             ),
 
             SizedBox(height: 16.h),
@@ -124,19 +128,19 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 onPressed: () {},
                 text: 'Small',
                 size: ButtonSize.small,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomOutlinedButton(
                 onPressed: () {},
                 text: 'Medium',
                 size: ButtonSize.medium,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomOutlinedButton(
                 onPressed: () {},
                 text: 'Large',
                 size: ButtonSize.large,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
             SizedBox(height: 8.h),
@@ -145,13 +149,13 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 onPressed: () {},
                 text: 'Secondary',
                 type: ButtonType.secondary,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomOutlinedButton(
                 onPressed: () {},
                 text: 'Destructive',
                 type: ButtonType.destructive,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
             SizedBox(height: 8.h),
@@ -159,7 +163,7 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
               onPressed: () {},
               text: 'Expanded Icon',
               expand: true,
-              isLoading: _isLoading,
+              isLoading: _buttonsLoading,
               leadingIcon: Icon(Icons.settings, size: 18.sp),
             ),
 
@@ -170,19 +174,19 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 onPressed: () {},
                 text: 'Small',
                 size: ButtonSize.small,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomTextButtonWidget(
                 onPressed: () {},
                 text: 'Medium',
                 size: ButtonSize.medium,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomTextButtonWidget(
                 onPressed: () {},
                 text: 'Large',
                 size: ButtonSize.large,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
             SizedBox(height: 8.h),
@@ -191,13 +195,13 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 onPressed: () {},
                 text: 'With Icon',
                 leadingIcon: Icon(Icons.info_outline, size: 16.sp),
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
               CustomTextButtonWidget(
                 onPressed: () {},
                 text: 'Custom Color',
                 customColor: Colors.orangeAccent,
-                isLoading: _isLoading,
+                isLoading: _buttonsLoading,
               ),
             ]),
 
@@ -228,16 +232,36 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
                 customSize: 32.sp,
               ),
               CustomIconButtonWidget(
-                onPressed: null,
+                onPressed: _buttonsLoading ? null : () {},
                 iconData: Icons.delete_forever,
-                tooltip: 'Disabled',
+                tooltip: 'Action (affected by loading)',
               ),
             ]),
 
-            const Divider(height: 32),
-            _buildSectionTitle(context, 'Form Fields'),
+            const Divider(thickness: 1, height: 48),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildSectionTitle(context, 'Form Fields'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Text("Enable: "),
+                    Switch(
+                      value: _fieldsEnabled,
+                      onChanged: (value) {
+                        setState(() {
+                          _fieldsEnabled = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
 
-            SizedBox(height: 16.h),
+            SizedBox(height: 8.h),
+
             _buildSectionTitle(context, 'CustomTextFieldWidget', isSub: true),
             CustomTextFieldWidget(
               labelText: 'Name',
@@ -249,7 +273,7 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
             ),
             SizedBox(height: 12.h),
             CustomTextFieldWidget(
-              labelText: 'Password',
+              labelText: 'Password (Obscured)',
               hintText: 'Enter password',
               prefixIcon: const Icon(Icons.lock_outline),
               obscureText: true,
@@ -261,9 +285,9 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
             _buildSectionTitle(context, 'CustomTextAreaWidget', isSub: true),
             CustomTextAreaWidget(
               labelText: 'Description',
-              hintText: 'Enter item description (max 3 lines for display)',
+              hintText: 'Enter item description...',
               minLines: 2,
-              maxLines: 3,
+              maxLines: 4,
               enabled: _fieldsEnabled,
             ),
 
@@ -278,7 +302,7 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
             ),
             SizedBox(height: 12.h),
             CustomNumberInputField(
-              labelText: 'Quantity',
+              labelText: 'Quantity (Integer only)',
               hintText: '0',
               allowDecimal: false,
               enabled: _fieldsEnabled,
@@ -288,6 +312,7 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
             _buildSectionTitle(context, 'CustomDateSelectorField', isSub: true),
             CustomDateSelectorField(
               labelText: 'Purchase Date',
+              hintText: 'Tap to select date',
               initialDate: _selectedDate,
               onDateSelected: (date) {
                 setState(() => _selectedDate = date);
@@ -303,12 +328,15 @@ class _WidgetLibraryScreenState extends State<WidgetLibraryScreen> {
             _buildSectionTitle(context, 'CustomTimeSelectorField', isSub: true),
             CustomTimeSelectorField(
               labelText: 'Pickup Time',
+              hintText: 'Tap to select time',
               initialTime: _selectedTime,
               onTimeSelected: (time) {
                 setState(() => _selectedTime = time);
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('Time Selected: $time')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Time Selected: ${time?.format(context)}'),
+                  ),
+                );
               },
               enabled: _fieldsEnabled,
             ),
