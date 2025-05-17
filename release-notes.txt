@@ -5,3 +5,4 @@ Release 2
 - Customer Details
 - Better error handling
 - Custom snackbar and widgets
+- FIXES: stuck in loader while startup
