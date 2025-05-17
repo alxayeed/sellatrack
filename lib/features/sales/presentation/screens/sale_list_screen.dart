@@ -112,6 +112,26 @@ class SaleListScreen extends ConsumerWidget {
                   ); // Navigate to CustomerListScreen
                 },
               ),
+
+              TextButton.icon(
+                // Using TextButton for a less prominent look for now
+                icon: const Icon(Icons.people_alt_outlined),
+                label: const Text('Widget Library'),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(200, 48),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  textStyle: theme.textTheme.titleMedium,
+                  foregroundColor: theme.colorScheme.secondary,
+                ),
+                onPressed: () {
+                  context.push(
+                    AppRoutePaths.widgetLibrary,
+                  ); // Navigate to CustomerListScreen
+                },
+              ),
             ],
           ),
         ),

@@ -12,7 +12,8 @@ import 'package:sellatrack/features/customers/presentation/screens/customer_list
 import 'package:sellatrack/features/customers/presentation/screens/edit_customer_screen.dart'; // Import EditCustomerScreen
 
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
-import '../widgets/splash_screen.dart';
+import '../widgets/screens/splash_screen.dart';
+import '../widgets/screens/widget_library_screen.dart';
 import 'router_listenable.dart';
 
 class AppRoutePaths {
@@ -30,10 +31,12 @@ class AppRoutePaths {
   static const String editCustomer =
       'edit/:customerId'; // Path for editing a specific customer
   static const String editCustomerNamed = 'edit-customer';
+
+  static const String widgetLibrary = '/widget-library';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final routerListener = ref.watch(routerListenableProvider);
+  ref.watch(routerListenableProvider);
 
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
@@ -122,6 +125,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutePaths.widgetLibrary,
+        builder: (context, state) => const WidgetLibraryScreen(),
       ),
     ],
     // redirect: (BuildContext context, GoRouterState state) {

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sellatrack/core/navigation/app_router.dart';
 
-import '../constants/app_colors.dart';
-import '../styles/app_text_styles.dart'; // For AppRoutePaths
+import '../../constants/app_colors.dart';
+import '../../styles/app_text_styles.dart'; // For AppRoutePaths
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
