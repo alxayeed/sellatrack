@@ -5,6 +5,8 @@ import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/auth/presentation/notifiers/auth_state.dart';
 import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
 
+import '../../../../core/widgets/app_snack_bar.dart';
+
 class AuthenticationScreen extends ConsumerStatefulWidget {
   const AuthenticationScreen({super.key});
 
@@ -18,6 +20,38 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLogin = true;
+  bool _initialAuthCheckDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //TODO: implement go router redirect for this check
+      _checkInitialAuthStateAndNavigate();
+    });
+  }
+
+  Future<void> _checkInitialAuthStateAndNavigate() async {
+    if (_initialAuthCheckDone || !mounted) return;
+    _initialAuthCheckDone = true;
+
+    // final authUserAsync = ref.read(authStateChangesProvider);
+    // final authUser = authUserAsync.valueOrNull;
+
+    // Option 2: More robustly, use the AuthNotifier which has detailed state
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.checkCurrentUser();
+    final currentAuthState = ref.read(authNotifierProvider);
+    final authUser = currentAuthState.user;
+
+    if (authUser != null) {
+      if (authUser.displayName != null && authUser.displayName!.isNotEmpty) {
+        if (mounted) context.go(AppRoutePaths.sales);
+      } else {
+        if (mounted) context.go(AppRoutePaths.profileCompletion);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -38,6 +72,7 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
             controller: forgotPasswordEmailController,
             decoration: const InputDecoration(labelText: 'Enter your email'),
             keyboardType: TextInputType.emailAddress,
+            autofocus: true,
           ),
           actions: <Widget>[
             TextButton(
@@ -47,18 +82,29 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
               },
             ),
             TextButton(
-              child: const Text('Send Reset Link'),
+              child: const Text('Send Link'),
               onPressed: () {
-                if (forgotPasswordEmailController.text.isNotEmpty) {
-                  ref.read(authNotifierProvider.notifier);
-
+                if (forgotPasswordEmailController.text.trim().isNotEmpty) {
+                  if (!RegExp(
+                    r'^[^@]+@[^@]+\.[^@]+',
+                  ).hasMatch(forgotPasswordEmailController.text.trim())) {
+                    AppSnackBar.showError(
+                      dialogContext,
+                      message: 'Please enter a valid email address.',
+                    );
+                    return;
+                  }
+                  // ref.read(authNotifierProvider.notifier).sendPasswordResetEmail(
+                  // forgotPasswordEmailController.text.trim()); // TODO: Uncomment when method exists in notifier
                   Navigator.of(dialogContext).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Password reset email sent if account exists.',
-                      ),
-                    ),
+                  AppSnackBar.showInfo(
+                    context,
+                    message: 'Forgot Password - Coming Soon!',
+                  );
+                } else {
+                  AppSnackBar.showError(
+                    dialogContext,
+                    message: 'Please enter your email.',
                   );
                 }
               },
@@ -76,32 +122,41 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
     final theme = Theme.of(context);
 
     ref.listen<AuthScreenState>(authNotifierProvider, (previous, next) {
+      final bool wasLoading =
+          previous?.status == AuthStatus.loading &&
+          (previous!.isLoadingSignIn || previous.isLoadingSignUp);
+      final bool isNowError = next.status == AuthStatus.error;
+
       if (next.status == AuthStatus.profileIncomplete) {
-        context.go(AppRoutePaths.profileCompletion);
+        if (mounted) context.go(AppRoutePaths.profileCompletion);
       } else if (next.status == AuthStatus.authenticated) {
-        context.go(AppRoutePaths.sales);
+        if (mounted) context.go(AppRoutePaths.sales);
       }
+
       if (next.errorMessage != null &&
           next.errorMessage!.isNotEmpty &&
-          (previous?.errorMessage != next.errorMessage ||
-              previous?.status != next.status)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
+          (isNowError && wasLoading)) {
+        AppSnackBar.showError(context, message: next.errorMessage!);
       }
+
       if (next.status == AuthStatus.passwordResetEmailSent &&
           previous?.status != AuthStatus.passwordResetEmailSent) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset email sent successfully!'),
-            backgroundColor: Colors.green,
-          ),
+        AppSnackBar.showSuccess(
+          context,
+          message: 'Password reset email sent successfully!',
         );
       }
     });
+
+    // If initial check already determined a redirect, show loader until GoRouter navigates
+    // This is a bit tricky because the redirect might happen before this build method
+    // if the initial check is very fast. A global redirect is often cleaner for this.
+    // However, if SplashScreen always navigates here, this screen *will* build.
+    // If _initialAuthCheckDone is false AND authState indicates loading from checkCurrentUser, show loader.
+    if (!_initialAuthCheckDone &&
+        (authState.status == AuthStatus.loading && authState.user == null)) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       body: Center(
@@ -187,13 +242,16 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         FocusScope.of(context).unfocus();
+                        final authNotifierInstance = ref.read(
+                          authNotifierProvider.notifier,
+                        );
                         if (_isLogin) {
-                          authNotifier.signInWithEmailPassword(
+                          authNotifierInstance.signInWithEmailPassword(
                             _emailController.text.trim(),
                             _passwordController.text.trim(),
                           );
                         } else {
-                          authNotifier.signUpWithEmailPassword(
+                          authNotifierInstance.signUpWithEmailPassword(
                             _emailController.text.trim(),
                             _passwordController.text.trim(),
                           );
@@ -218,6 +276,8 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
                         setState(() {
                           _isLogin = !_isLogin;
                           _formKey.currentState?.reset();
+                          _emailController.clear();
+                          _passwordController.clear();
                         });
                       },
                       child: Text(

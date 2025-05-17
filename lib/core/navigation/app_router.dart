@@ -12,6 +12,7 @@ import 'package:sellatrack/features/customers/presentation/screens/customer_list
 import 'package:sellatrack/features/customers/presentation/screens/edit_customer_screen.dart'; // Import EditCustomerScreen
 
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
+import '../widgets/splash_screen.dart';
 import 'router_listenable.dart';
 
 class AppRoutePaths {
@@ -37,14 +38,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
     debugLogDiagnostics: true,
-    refreshListenable: routerListener,
+    // refreshListenable: routerListener,
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutePaths.splash,
-        builder:
-            (context, state) => const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
+        builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.authentication,
@@ -114,12 +112,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   if (customerToEdit != null) {
                     return EditCustomerScreen(customerToEdit: customerToEdit);
                   }
-                  // Fallback if not passed via extra, or if detail screen didn't pass it
-                  // Ideally, the detail screen would fetch its customer, then pass that customer object
-                  // as 'extra' when navigating to its own edit sub-route.
-                  // Or, EditCustomerScreen would take customerId from pathParameters of its parent
-                  // and fetch data itself.
-                  // For now, we rely on 'extra' from the detail screen's navigation to edit.
                   return const Scaffold(
                     body: Center(
                       child: Text('Customer to edit not found via extra.'),
@@ -132,31 +124,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-    redirect: (BuildContext context, GoRouterState state) {
-      final bool isInitialized = routerListener.initialAuthCheckDone;
-      final bool isLoggedIn = routerListener.isLoggedIn;
-      final String intendedLocation = state.matchedLocation;
-
-      // If initialized and logged in:
-      if (isLoggedIn) {
-        // If they are trying to go to auth screen, or are on splash, redirect to sales.
-        if (intendedLocation == AppRoutePaths.authentication ||
-            intendedLocation == AppRoutePaths.splash) {
-          return AppRoutePaths.sales;
-        }
-        // Otherwise, let them go where they intended (e.g., /sales, /profile, /customers)
-        return null;
-      }
-      // If initialized and NOT logged in:
-      else {
-        // If they are not already on the auth screen or splash, redirect to auth.
-        if (intendedLocation != AppRoutePaths.authentication &&
-            intendedLocation != AppRoutePaths.splash) {
-          return AppRoutePaths.authentication;
-        }
-        // Otherwise, let them stay on auth or splash
-        return null;
-      }
-    },
+    // redirect: (BuildContext context, GoRouterState state) {
+    //   final bool isInitialized = routerListener.initialAuthCheckDone;
+    //   final bool isLoggedIn = routerListener.isLoggedIn;
+    //   final String intendedLocation = state.matchedLocation;
+    //
+    //   // If initialized and logged in:
+    //   if (isLoggedIn) {
+    //     // If they are trying to go to auth screen, or are on splash, redirect to sales.
+    //     if (intendedLocation == AppRoutePaths.authentication ||
+    //         intendedLocation == AppRoutePaths.splash) {
+    //       return AppRoutePaths.sales;
+    //     }
+    //     // Otherwise, let them go where they intended (e.g., /sales, /profile, /customers)
+    //     return null;
+    //   }
+    //   // If initialized and NOT logged in:
+    //   else {
+    //     // If they are not already on the auth screen or splash, redirect to auth.
+    //     if (intendedLocation != AppRoutePaths.authentication &&
+    //         intendedLocation != AppRoutePaths.splash) {
+    //       return AppRoutePaths.authentication;
+    //     }
+    //     // Otherwise, let them stay on auth or splash
+    //     return null;
+    //   }
+    // },
   );
 });
