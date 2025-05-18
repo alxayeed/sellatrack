@@ -123,9 +123,8 @@ class AppDrawerWidget extends ConsumerWidget {
             ),
             // Use AppStrings.signOut
             onTap: () {
-              Navigator.pop(context);
-              // Consider showing a confirmation dialog before sign out
               ref.read(authNotifierProvider.notifier).signOut();
+              // context.go(AppRoutePaths.authentication);
             },
           ),
         ],

@@ -71,8 +71,8 @@ class ProfileScreen extends ConsumerWidget {
               ),
               child: const Text('Sign Out'),
               onPressed: () {
-                Navigator.of(dialogContext).pop();
                 authNotifier.signOut();
+                // context.go(AppRoutePaths.authentication);
               },
             ),
           ],

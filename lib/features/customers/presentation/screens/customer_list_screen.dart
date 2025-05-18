@@ -39,6 +39,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
     super.dispose();
   }
 
+  // ignore: unused_element
   void _onSearchChanged(String query) {
     ref
         .read(customerListNotifierProvider.notifier)
