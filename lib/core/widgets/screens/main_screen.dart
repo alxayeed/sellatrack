@@ -5,57 +5,48 @@ import 'package:sellatrack/core/widgets/app_layout/bottom_nav_bar_widget.dart';
 import 'package:sellatrack/core/widgets/app_layout/custom_app_bar.dart';
 
 import '../../constants/app_strings.dart';
-// We'll use a standard AppBar here for now, CustomAppBar can be integrated if needed.
+import '../../navigation/app_router.dart';
 
 class MainScreen extends StatelessWidget {
-  final StatefulNavigationShell navigationShell; // Provided by GoRouter
+  final Widget child;
 
-  const MainScreen({super.key, required this.navigationShell});
+  const MainScreen({super.key, required this.child});
 
-  void _onBottomNavTap(int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+  int _getSelectedIndex(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+
+    if (location.startsWith(AppRoutePaths.sales)) return 0;
+    if (location.startsWith(AppRoutePaths.home)) return 1;
+    if (location.startsWith(AppRoutePaths.stocks)) return 2;
+
+    return 0; // default to sales
   }
 
-  // String _getTitleForIndex(int index) {
-  //   switch (index) {
-  //     case 0:
-  //       return 'Sales Dashboard'; // AppStrings.salesTitle
-  //     case 1:
-  //       return 'Stock Management'; // AppStrings.stocksTitle
-  //     case 2:
-  //       return 'My Profile'; // AppStrings.profileTitle
-  //     default:
-  //       return 'SellaTrack'; // AppStrings.appName
-  //   }
-  // }
+  void _onBottomNavTap(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go(AppRoutePaths.sales);
+        break;
+      case 1:
+        context.go(AppRoutePaths.home);
+        break;
+      case 2:
+        context.go(AppRoutePaths.stocks);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final currentIndex = _getSelectedIndex(context);
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: AppStrings.appName,
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {
-        //       context.push(AppRoutePaths.profile);
-        //     },
-        //     icon: Icon(Icons.person),
-        //   ),
-        // ],
-      ),
-
+      appBar: CustomAppBar(title: AppStrings.appName),
       drawer: const AppDrawerWidget(),
-      // Add the drawer
-      body: navigationShell,
-      // This is where the child route's screen is displayed
+      body: child,
       bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _onBottomNavTap,
+        currentIndex: currentIndex,
+        onTap: (index) => _onBottomNavTap(context, index),
       ),
     );
   }

@@ -34,39 +34,26 @@ class AppRoutePaths {
   static const String authentication = '/auth';
   static const String home = '/home';
   static const String profileCompletion = '/complete-profile';
-  static const String widgetLibrary =
-      '/dev/widget-library'; // Made path more distinct
+  static const String widgetLibrary = '/dev/widget-library';
 
   static const String sales = '/sales';
   static const String stocks = '/stocks';
-  static const String customers =
-      '/customers'; // Top-level path for customers feature
+  static const String customers = '/customers';
   static const String profile = '/profile';
 
   static const String updateAuthProfileSubPath = 'edit-auth-profile';
   static const String updateAuthProfileNamed = 'update-auth-profile';
 
-  static const String addCustomer = 'add'; // Sub-path relative to /customers
-  static const String customerDetail =
-      'detail/:customerId'; // Sub-path relative to /customers
-  static const String customerDetailNamed =
-      'customer-detail'; // Name for a specific customer detail view
-  static const String editCustomerSubPath =
-      'edit'; // Sub-path relative to /customers/detail/:customerId
+  static const String addCustomer = 'add';
+  static const String customerDetail = 'detail/:customerId';
+  static const String customerDetailNamed = 'customer-detail';
+  static const String editCustomerSubPath = 'edit';
   static const String editCustomerNamed = 'edit-customer-profile';
 }
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
-final GlobalKey<NavigatorState> _shellNavigatorKeySales =
-    GlobalKey<NavigatorState>(debugLabel: 'shellSales');
-final GlobalKey<NavigatorState> _shellNavigatorKeyStocks =
-    GlobalKey<NavigatorState>(debugLabel: 'shellStocks');
-final GlobalKey<NavigatorState> _shellNavigatorKeyCustomers = // New Key
-    GlobalKey<NavigatorState>(debugLabel: 'shellCustomers');
-final GlobalKey<NavigatorState> _shellNavigatorKeyProfile =
-    GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final routerListener = ref.watch(routerListenableProvider);
@@ -76,54 +63,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: AppRoutePaths.splash,
     debugLogDiagnostics: true,
     refreshListenable: routerListener,
-    // Assuming you want reactive redirects
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutePaths.splash,
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.widgetLibrary, // For dev purposes
+        path: AppRoutePaths.widgetLibrary,
         builder: (context, state) => const WidgetLibraryScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.authentication,
-        builder:
-            (BuildContext context, GoRouterState state) =>
-                const AuthenticationScreen(),
+        builder: (context, state) => const AuthenticationScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.profileCompletion,
-        builder:
-            (BuildContext context, GoRouterState state) =>
-                const ProfileCompletionScreen(),
+        builder: (context, state) => const ProfileCompletionScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.profile,
-        builder:
-            (BuildContext context, GoRouterState state) =>
-                const ProfileScreen(),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.customers, // Top level path for the branch
-        builder:
-            (BuildContext context, GoRouterState state) =>
-                const CustomerListScreen(),
+        path: AppRoutePaths.customers,
+        builder: (context, state) => const CustomerListScreen(),
         routes: <RouteBase>[
           GoRoute(
-            path: AppRoutePaths.addCustomer, // 'add'
-            name: 'customers_add_customer', // Unique name
-            builder:
-                (BuildContext context, GoRouterState state) =>
-                    const AddCustomerScreen(),
+            path: AppRoutePaths.addCustomer,
+            name: 'customers_add_customer',
+            builder: (context, state) => const AddCustomerScreen(),
           ),
           GoRoute(
             path: AppRoutePaths.customerDetail,
-            // 'detail/:customerId'
             name: AppRoutePaths.customerDetailNamed,
-            builder: (BuildContext context, GoRouterState state) {
-              final customer = state.extra as CustomerEntity?;
-              if (customer != null) {
+            builder: (context, state) {
+              final customer = state.extra;
+              if (customer is CustomerEntity) {
                 return CustomerDetailScreen(customer: customer);
               }
               return const Scaffold(
@@ -132,11 +107,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
             routes: <RouteBase>[
               GoRoute(
-                path: AppRoutePaths.editCustomerSubPath, // 'edit'
+                path: AppRoutePaths.editCustomerSubPath,
                 name: AppRoutePaths.editCustomerNamed,
-                builder: (BuildContext context, GoRouterState state) {
-                  final customerToEdit = state.extra as CustomerEntity?;
-                  if (customerToEdit != null) {
+                builder: (context, state) {
+                  final customerToEdit = state.extra;
+                  if (customerToEdit is CustomerEntity) {
                     return EditCustomerScreen(customerToEdit: customerToEdit);
                   }
                   return const Scaffold(
@@ -149,58 +124,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // GoRoute(
-      //   path: AppRoutePaths.customers,
-      //   builder:
-      //       (BuildContext context, GoRouterState state) =>
-      //           const CustomerListScreen(),
-      // ),
-      StatefulShellRoute.indexedStack(
-        builder: (
-          BuildContext context,
-          GoRouterState state,
-          StatefulNavigationShell navigationShell,
-        ) {
-          return MainScreen(navigationShell: navigationShell);
+      // Shell route for main sections with shared layout
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainScreen(child: child);
         },
-        branches: <StatefulShellBranch>[
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorKeySales,
-            routes: <RouteBase>[
-              GoRoute(
-                path: AppRoutePaths.sales,
-                builder:
-                    (BuildContext context, GoRouterState state) =>
-                        const SaleListScreen(),
-              ),
-            ],
+        routes: <RouteBase>[
+          GoRoute(
+            path: AppRoutePaths.sales,
+            builder: (context, state) => const SaleListScreen(),
           ),
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorKeyProfile,
-            routes: <RouteBase>[
-              GoRoute(
-                path: AppRoutePaths.home,
-                builder:
-                    (BuildContext context, GoRouterState state) =>
-                        const HomeScreen(),
-              ),
-            ],
+          GoRoute(
+            path: AppRoutePaths.home,
+            builder: (context, state) => const HomeScreen(),
           ),
-
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorKeyStocks,
-            routes: <RouteBase>[
-              GoRoute(
-                path: AppRoutePaths.stocks,
-                builder:
-                    (BuildContext context, GoRouterState state) =>
-                        const StocksScreen(),
-              ),
-            ],
+          GoRoute(
+            path: AppRoutePaths.stocks,
+            builder: (context, state) => const StocksScreen(),
           ),
         ],
       ),
     ],
+
+    // Redirect logic: Uncomment and configure as needed
     // redirect: (BuildContext context, GoRouterState state) {
     //   if (!routerListener.initialCheckDone) {
     //     return AppRoutePaths.splash;
@@ -215,8 +161,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     //     AppRoutePaths.authentication,
     //     AppRoutePaths.profileCompletion,
     //   ];
-    //   final bool isOnAuthFlowPath = authFlowPaths.contains(intendedPath.split('?').first);
-    //
+    //   final bool isOnAuthFlowPath =
+    //       authFlowPaths.contains(intendedPath.split('?').first);
     //
     //   if (!isLoggedIn) {
     //     return isOnAuthFlowPath ? null : AppRoutePaths.authentication;
@@ -224,8 +170,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     //
     //   if (!isProfileComplete) {
     //     return intendedPath == AppRoutePaths.profileCompletion ||
-    //         intendedPath == AppRoutePaths.authentication ||
-    //         intendedPath == AppRoutePaths.splash
+    //             intendedPath == AppRoutePaths.authentication ||
+    //             intendedPath == AppRoutePaths.splash
     //         ? null
     //         : AppRoutePaths.profileCompletion;
     //   }
