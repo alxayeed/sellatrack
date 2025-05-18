@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class LoadingIndicatorWidget extends StatelessWidget {
+class CustomLoadingIndicatorWidget extends StatelessWidget {
   final String? message;
 
-  const LoadingIndicatorWidget({super.key, this.message});
+  const CustomLoadingIndicatorWidget({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {

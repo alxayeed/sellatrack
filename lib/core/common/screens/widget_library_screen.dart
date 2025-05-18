@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sellatrack/core/widgets/components/button_defs.dart';
-import 'package:sellatrack/core/widgets/components/custom_date_selector_field.dart';
-import 'package:sellatrack/core/widgets/components/custom_elevated_button.dart';
-import 'package:sellatrack/core/widgets/components/custom_icon_button_widget.dart';
-import 'package:sellatrack/core/widgets/components/custom_number_input_field.dart';
-import 'package:sellatrack/core/widgets/components/custom_outlined_button.dart';
-import 'package:sellatrack/core/widgets/components/custom_single_select_dropdown_field.dart';
-import 'package:sellatrack/core/widgets/components/custom_text_area_widget.dart';
-import 'package:sellatrack/core/widgets/components/custom_text_button_widget.dart';
-import 'package:sellatrack/core/widgets/components/custom_text_field_widget.dart';
-import 'package:sellatrack/core/widgets/components/custom_time_selector_field.dart';
+import 'package:sellatrack/core/common/components/button_defs.dart';
+import 'package:sellatrack/core/common/components/custom_date_selector_field.dart';
+import 'package:sellatrack/core/common/components/custom_elevated_button.dart';
+import 'package:sellatrack/core/common/components/custom_icon_button_widget.dart';
+import 'package:sellatrack/core/common/components/custom_number_input_field.dart';
+import 'package:sellatrack/core/common/components/custom_outlined_button.dart';
+import 'package:sellatrack/core/common/components/custom_single_select_dropdown_field.dart';
+import 'package:sellatrack/core/common/components/custom_text_area_widget.dart';
+import 'package:sellatrack/core/common/components/custom_text_button_widget.dart';
+import 'package:sellatrack/core/common/components/custom_text_field_widget.dart';
+import 'package:sellatrack/core/common/components/custom_time_selector_field.dart';
 
 class WidgetLibraryScreen extends StatefulWidget {
   const WidgetLibraryScreen({super.key});

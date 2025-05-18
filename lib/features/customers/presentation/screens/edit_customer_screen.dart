@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
 import 'package:sellatrack/features/customers/presentation/providers/customer_providers.dart';
 
+import '../../../../core/common/components/app_snack_bar.dart';
 import '../../../../core/navigation/app_router.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 
 // Assuming CustomerListNotifier will also handle updates for now, or a dedicated edit notifier

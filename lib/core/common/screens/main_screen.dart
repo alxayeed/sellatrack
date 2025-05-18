@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // ADD THIS
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/widgets/app_layout/app_drawer_widget.dart';
-import 'package:sellatrack/core/widgets/app_layout/bottom_nav_bar_widget.dart';
-import 'package:sellatrack/core/widgets/app_layout/custom_app_bar.dart';
+import 'package:sellatrack/core/common/app_layout/app_drawer_widget.dart';
+import 'package:sellatrack/core/common/app_layout/bottom_nav_bar_widget.dart';
+import 'package:sellatrack/core/common/app_layout/custom_app_bar.dart';
 
 import '../../../features/auth/presentation/notifiers/auth_state.dart';
 import '../../../features/auth/presentation/providers/auth_providers.dart';

@@ -5,7 +5,7 @@ import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/auth/presentation/notifiers/auth_state.dart';
 import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
 
-import '../../../../core/widgets/app_snack_bar.dart';
+import '../../../../core/common/common.dart';
 
 class AuthenticationScreen extends ConsumerStatefulWidget {
   const AuthenticationScreen({super.key});

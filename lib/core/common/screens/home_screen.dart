@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/widgets/app_layout/app_drawer_widget.dart';
+import 'package:sellatrack/core/common/app_layout/app_drawer_widget.dart';
 
 import '../../navigation/app_router.dart';
 // We'll use a standard AppBar here for now, CustomAppBar can be integrated if needed.

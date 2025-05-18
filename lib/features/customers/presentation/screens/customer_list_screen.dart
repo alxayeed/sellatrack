@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/widgets/app_layout/custom_app_bar.dart';
-import 'package:sellatrack/core/widgets/empty_list_widget.dart';
-import 'package:sellatrack/core/widgets/error_display_widget.dart';
-import 'package:sellatrack/core/widgets/loading_indicator_widget.dart';
 import 'package:sellatrack/features/customers/presentation/notifiers/customer_list_notifier.dart';
 import 'package:sellatrack/features/customers/presentation/notifiers/customer_list_state.dart';
 import 'package:sellatrack/features/customers/presentation/providers/customer_providers.dart';
 import 'package:sellatrack/features/customers/presentation/widgets/customer_list_item_widget.dart';
 
+import '../../../../core/common/common.dart';
 import '../../../../core/navigation/app_router.dart';
-import '../../../../core/widgets/app_layout/app_drawer_widget.dart';
-import '../../../../core/widgets/app_snack_bar.dart';
 
 class CustomerListScreen extends ConsumerStatefulWidget {
   const CustomerListScreen({super.key});
@@ -100,9 +95,11 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
     switch (customerState.status) {
       case CustomerListStatus.initial:
       case CustomerListStatus.loading:
-        return const LoadingIndicatorWidget(message: 'Loading customers...');
+        return const CustomLoadingIndicatorWidget(
+          message: 'Loading customers...',
+        );
       case CustomerListStatus.error:
-        return ErrorDisplayWidget(
+        return CustomErrorDisplayWidget(
           errorMessage:
               customerState.errorMessage ?? 'Failed to load customers.',
           onRetry:
@@ -111,7 +108,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
               ),
         );
       case CustomerListStatus.empty:
-        return EmptyListWidget(
+        return CustomEmptyListWidget(
           message: 'No customers found.',
           icon: Icons.people_outline_rounded,
           onRetry: () => customerNotifier.fetchCustomers(), // Retry fetching
@@ -120,7 +117,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
       case CustomerListStatus.success:
         if (customerState.customers.isEmpty &&
             _searchController.text.isNotEmpty) {
-          return EmptyListWidget(
+          return CustomEmptyListWidget(
             message:
                 'No customers match your search for "${_searchController.text}".',
             icon: Icons.search_off_rounded,

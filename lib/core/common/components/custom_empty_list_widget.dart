@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class EmptyListWidget extends StatelessWidget {
+class CustomEmptyListWidget extends StatelessWidget {
   final String message;
   final IconData? icon;
   final VoidCallback? onRetry; // Optional: If you want a retry/add button
   final String? retryButtonText;
 
-  const EmptyListWidget({
+  const CustomEmptyListWidget({
     super.key,
     required this.message,
     this.icon,

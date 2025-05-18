@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/widgets/screens/home_screen.dart';
-import 'package:sellatrack/core/widgets/screens/splash_screen.dart';
-import 'package:sellatrack/core/widgets/screens/widget_library_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/authentication_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
@@ -14,7 +11,7 @@ import '../../features/customers/presentation/screens/add_customer_screen.dart';
 import '../../features/customers/presentation/screens/customer_detail_screen.dart';
 import '../../features/customers/presentation/screens/edit_customer_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
-import '../widgets/screens/main_screen.dart';
+import '../common/common.dart';
 import 'router_listenable.dart';
 
 class StocksScreen extends StatelessWidget {

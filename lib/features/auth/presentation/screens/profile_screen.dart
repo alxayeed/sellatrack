@@ -5,8 +5,8 @@ import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/auth/presentation/notifiers/auth_state.dart';
 import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
 
+import '../../../../core/common/app_layout/custom_app_bar.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_layout/custom_app_bar.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

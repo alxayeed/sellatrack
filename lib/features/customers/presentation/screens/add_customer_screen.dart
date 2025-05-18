@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sellatrack/features/customers/presentation/providers/customer_providers.dart';
 
-import '../../../../core/widgets/app_snack_bar.dart';
+import '../../../../core/common/components/app_snack_bar.dart';
 
 // Import CustomerListStatus if needed for loading state, though addCustomer returns bool
 // import 'package:sellatrack/features/customers/presentation/notifiers/customer_list_state.dart';
