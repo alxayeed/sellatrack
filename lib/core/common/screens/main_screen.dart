@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../navigation/app_router.dart';
+import '../app_layout/app_drawer_widget.dart';
 
 class MainScreen extends StatelessWidget {
   final Widget child;
@@ -71,6 +72,7 @@ class MainScreen extends StatelessWidget {
                 ),
       ),
       body: child,
+      drawer: const AppDrawerWidget(),
       bottomNavigationBar:
           isRootRoute
               ? BottomNavigationBar(

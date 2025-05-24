@@ -16,7 +16,7 @@ import '../../features/sales/presentation/screens/sale_detail_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
 import '../common/common.dart';
 import '../common/screens/stocks_screen.dart';
-import 'router_listenable.dart';
+import '../navigation/router_listenable.dart';
 
 class AppRoutePaths {
   static const String splash = '/';
@@ -38,10 +38,10 @@ class AppRoutePaths {
   static const String editCustomerSubPath = 'edit';
   static const String editCustomerNamed = 'edit-customer-profile';
 
-  //UPDATE THIS
+  // Sales routes
   static const String sales = '/sales';
-  static const String addSaleNamed = 'add-sale';
-  static const String saleDetail = 'detail';
+  static const String addSaleNamed = 'add';
+  static const String saleDetail = 'detail/:saleId';
   static const String saleDetailNamed = 'sale-detail';
   static const String editSaleSubPath = 'edit';
   static const String editSaleNamed = 'edit-sale';
@@ -60,6 +60,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     refreshListenable: routerListener,
     routes: <RouteBase>[
+      // Routes outside the shell (no MainScreen scaffold)
       GoRoute(
         path: AppRoutePaths.splash,
         builder: (context, state) => const SplashScreen(),
@@ -80,66 +81,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutePaths.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
-      GoRoute(
-        path: AppRoutePaths.customers,
-        builder: (context, state) => const CustomerListScreen(),
-        routes: <RouteBase>[
-          GoRoute(
-            path: AppRoutePaths.addCustomer,
-            name: 'customers_add_customer',
-            builder: (context, state) => const AddCustomerScreen(),
-          ),
-          GoRoute(
-            path: AppRoutePaths.customerDetail,
-            name: AppRoutePaths.customerDetailNamed,
-            builder: (context, state) {
-              final customer = state.extra;
-              if (customer is CustomerEntity) {
-                return CustomerDetailScreen(customer: customer);
-              }
-              return const Scaffold(
-                body: Center(child: Text('Customer not found')),
-              );
-            },
-            routes: <RouteBase>[
-              GoRoute(
-                path: AppRoutePaths.editCustomerSubPath,
-                name: AppRoutePaths.editCustomerNamed,
-                builder: (context, state) {
-                  final customerToEdit = state.extra;
-                  if (customerToEdit is CustomerEntity) {
-                    return EditCustomerScreen(customerToEdit: customerToEdit);
-                  }
-                  return const Scaffold(
-                    body: Center(child: Text('Customer to edit not found.')),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
 
-      // Shell route for main sections with shared layout
+      // Shell route wrapping main sections with MainScreen scaffold
       ShellRoute(
         builder: (context, state, child) {
-          return MainScreen(
-            location: state.fullPath ?? state.uri.toString(),
-            child: child,
-          );
+          // Use fullPath or location string for MainScreen to determine UI
+          final location = state.fullPath ?? state.uri.toString();
+          return MainScreen(location: location, child: child);
         },
         routes: [
+          // Sales main screen + nested sales routes
           GoRoute(
             path: AppRoutePaths.sales,
             builder: (context, state) => const SalesListScreen(),
             routes: [
               GoRoute(
-                path: AppRoutePaths.addSaleNamed,
+                path: AppRoutePaths.addSaleNamed, // 'add'
                 name: AppRoutePaths.addSaleNamed,
                 builder: (context, state) => const AddEditSaleScreen(),
               ),
               GoRoute(
-                path: AppRoutePaths.saleDetail,
+                path: AppRoutePaths.saleDetail, // 'detail/:saleId'
                 name: AppRoutePaths.saleDetailNamed,
                 builder: (context, state) {
                   final sale = state.extra;
@@ -150,13 +112,77 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   }
                   return SaleDetailScreen(sale: sale);
                 },
+                routes: [
+                  GoRoute(
+                    path: AppRoutePaths.editSaleSubPath, // 'edit'
+                    name: AppRoutePaths.editSaleNamed,
+                    builder: (context, state) {
+                      final saleToEdit = state.extra;
+                      if (saleToEdit is! SaleEntity) {
+                        return const Scaffold(
+                          body: Center(child: Text('Sale to edit not found')),
+                        );
+                      }
+                      return AddEditSaleScreen(sale: saleToEdit);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
+
+          // Customers main screen + nested routes
+          GoRoute(
+            path: AppRoutePaths.customers,
+            builder: (context, state) => const CustomerListScreen(),
+            routes: [
+              GoRoute(
+                path: AppRoutePaths.addCustomer, // 'add'
+                name: 'customers_add_customer',
+                builder: (context, state) => const AddCustomerScreen(),
+              ),
+              GoRoute(
+                path: AppRoutePaths.customerDetail, // 'detail/:customerId'
+                name: AppRoutePaths.customerDetailNamed,
+                builder: (context, state) {
+                  final customer = state.extra;
+                  if (customer is CustomerEntity) {
+                    return CustomerDetailScreen(customer: customer);
+                  }
+                  return const Scaffold(
+                    body: Center(child: Text('Customer not found')),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: AppRoutePaths.editCustomerSubPath, // 'edit'
+                    name: AppRoutePaths.editCustomerNamed,
+                    builder: (context, state) {
+                      final customerToEdit = state.extra;
+                      if (customerToEdit is CustomerEntity) {
+                        return EditCustomerScreen(
+                          customerToEdit: customerToEdit,
+                        );
+                      }
+                      return const Scaffold(
+                        body: Center(
+                          child: Text('Customer to edit not found.'),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Stocks screen
           GoRoute(
             path: AppRoutePaths.stocks,
             builder: (context, state) => const StocksScreen(),
           ),
+
+          // Home screen
           GoRoute(
             path: AppRoutePaths.home,
             builder: (context, state) => const HomeScreen(),
@@ -165,41 +191,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
 
-    // Redirect logic: Uncomment and configure as needed
+    // Uncomment and adapt your redirect logic here if needed
     // redirect: (BuildContext context, GoRouterState state) {
-    //   if (!routerListener.initialCheckDone) {
-    //     return AppRoutePaths.splash;
-    //   }
-    //
-    //   final bool isLoggedIn = routerListener.isLoggedIn;
-    //   final bool isProfileComplete = routerListener.isProfileComplete;
-    //   final String intendedPath = state.uri.toString();
-    //
-    //   final authFlowPaths = [
-    //     AppRoutePaths.splash,
-    //     AppRoutePaths.authentication,
-    //     AppRoutePaths.profileCompletion,
-    //   ];
-    //   final bool isOnAuthFlowPath =
-    //       authFlowPaths.contains(intendedPath.split('?').first);
-    //
-    //   if (!isLoggedIn) {
-    //     return isOnAuthFlowPath ? null : AppRoutePaths.authentication;
-    //   }
-    //
-    //   if (!isProfileComplete) {
-    //     return intendedPath == AppRoutePaths.profileCompletion ||
-    //             intendedPath == AppRoutePaths.authentication ||
-    //             intendedPath == AppRoutePaths.splash
-    //         ? null
-    //         : AppRoutePaths.profileCompletion;
-    //   }
-    //
-    //   if (isOnAuthFlowPath) {
-    //     return AppRoutePaths.sales;
-    //   }
-    //
-    //   return null;
+    //   ...
     // },
   );
 });
