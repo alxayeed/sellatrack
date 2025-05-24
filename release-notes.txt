@@ -1,6 +1,4 @@
-Release 3
-- Sales list
-- Sales details
-- Sales add
-- Sales delete
-- New customer creation on sales
+Release 4
+- App icon and app name updated
+- Logo updated
+- double app bar fixed in customer details screen

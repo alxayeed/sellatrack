@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/customers/domain/entities/customer_entity.dart';
 
 class CustomerDetailScreen extends ConsumerWidget {
@@ -91,26 +89,26 @@ class CustomerDetailScreen extends ConsumerWidget {
     final DateFormat dateTimeFormat = DateFormat.yMMMd().add_jm();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(customer.name),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Edit Customer',
-            onPressed: () {
-              // Navigate to EditCustomerScreen, passing the customer object
-              // We defined 'edit' as a sub-route of customer detail in app_router
-              // context.goNamed(AppRoutePaths.editCustomerNamed, extra: customer);
-              // Or, if using the path directly and editCustomer is a sub-route of customerDetail
-              context.go(
-                '${GoRouterState.of(context).uri.toString()}/${AppRoutePaths.editCustomerSubPath}',
-                extra: customer,
-              );
-            },
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: Text(customer.name),
+      //   centerTitle: true,
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.edit_outlined),
+      //       tooltip: 'Edit Customer',
+      //       onPressed: () {
+      //         // Navigate to EditCustomerScreen, passing the customer object
+      //         // We defined 'edit' as a sub-route of customer detail in app_router
+      //         // context.goNamed(AppRoutePaths.editCustomerNamed, extra: customer);
+      //         // Or, if using the path directly and editCustomer is a sub-route of customerDetail
+      //         context.go(
+      //           '${GoRouterState.of(context).uri.toString()}/${AppRoutePaths.editCustomerSubPath}',
+      //           extra: customer,
+      //         );
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: <Widget>[

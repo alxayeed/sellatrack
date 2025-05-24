@@ -63,7 +63,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Routes outside the shell (no MainScreen scaffold)
       GoRoute(
         path: AppRoutePaths.splash,
-        builder: (context, state) => const SplashScreen(),
+        builder: (context, state) => const AuthenticationScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.widgetLibrary,
