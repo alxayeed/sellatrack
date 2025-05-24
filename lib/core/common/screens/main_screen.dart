@@ -35,8 +35,8 @@ class MainScreen extends StatelessWidget {
 
   int getSelectedIndex() {
     if (location.startsWith(AppRoutePaths.sales)) return 0;
-    if (location.startsWith(AppRoutePaths.stocks)) return 1;
-    if (location.startsWith(AppRoutePaths.home)) return 2;
+    if (location.startsWith(AppRoutePaths.home)) return 1;
+    if (location.startsWith(AppRoutePaths.stocks)) return 2;
     return 0;
   }
 
@@ -46,10 +46,10 @@ class MainScreen extends StatelessWidget {
         context.go(AppRoutePaths.sales);
         break;
       case 1:
-        context.go(AppRoutePaths.stocks);
+        context.go(AppRoutePaths.home);
         break;
       case 2:
-        context.go(AppRoutePaths.home);
+        context.go(AppRoutePaths.stocks);
         break;
     }
   }
@@ -83,13 +83,15 @@ class MainScreen extends StatelessWidget {
                     icon: Icon(Icons.sell),
                     label: 'Sales',
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.store),
-                    label: 'Stocks',
-                  ),
+
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
                     label: 'Home',
+                  ),
+
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.store),
+                    label: 'Stocks',
                   ),
                 ],
               )

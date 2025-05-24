@@ -70,12 +70,12 @@ class SalesListScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (_) => AlertDialog(
+          (dialogContext) => AlertDialog(
             title: const Text('Confirm Delete'),
             content: Text('Delete sale record for ${sale.customerNameAtSale}?'),
             actions: [
               CustomTextButtonWidget(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 text: 'Cancel',
               ),
               CustomElevatedButton(
@@ -83,7 +83,7 @@ class SalesListScreen extends ConsumerWidget {
                   ref
                       .read(salesNotifierProvider.notifier)
                       .softDeleteSale(sale.id, 'currentUserId');
-                  Navigator.pop(context);
+                  Navigator.of(dialogContext).pop();
                   AppSnackBar.showSuccess(context, message: 'Sale deleted');
                 },
                 text: 'Delete',
