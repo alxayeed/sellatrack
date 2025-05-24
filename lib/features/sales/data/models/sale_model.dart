@@ -62,7 +62,10 @@ class SaleModel extends SaleEntity {
       'customerNameAtSale': customerNameAtSale,
       'customerPhoneAtSale': customerPhoneAtSale,
       'customerAddressAtSale': customerAddressAtSale,
-      'productDetails': productDetails, // Serialize productDetails
+      'productDetails':
+          productDetails is ProductSoldDetailsModel
+              ? (productDetails as ProductSoldDetailsModel).toMap()
+              : ProductSoldDetailsModel.fromEntity(productDetails).toMap(),
       'totalSaleAmount': totalSaleAmount,
       'paymentMethod': paymentMethod,
       'notes': notes,

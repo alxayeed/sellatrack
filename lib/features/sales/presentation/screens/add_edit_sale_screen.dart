@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sellatrack/features/sales/domain/entities/sale_entity.dart';
 
 import '../../../../core/common/common.dart';
+import '../../../../core/di/providers.dart';
+import '../../domain/params/sale_input_data.dart';
 
 class AddEditSaleScreen extends ConsumerStatefulWidget {
   final SaleEntity? sale;
@@ -15,11 +17,15 @@ class AddEditSaleScreen extends ConsumerStatefulWidget {
 
 class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _customerNameController;
+  late final TextEditingController _customerAddressController;
   late final TextEditingController _customerPhoneController;
   late final TextEditingController _productNameController;
   late final TextEditingController _quantityController;
   late final TextEditingController _priceController;
   late final TextEditingController _notesController;
+
   late String _selectedUnit;
   late String? _selectedPaymentMethod;
   late DateTime _selectedDate;
@@ -28,6 +34,13 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
   void initState() {
     super.initState();
     final sale = widget.sale;
+
+    _customerNameController = TextEditingController(
+      text: sale?.customerNameAtSale ?? '',
+    );
+    _customerAddressController = TextEditingController(
+      text: sale?.customerAddressAtSale ?? '',
+    );
     _customerPhoneController = TextEditingController(
       text: sale?.customerPhoneAtSale ?? '',
     );
@@ -49,16 +62,30 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.sale == null ? 'Add Sale' : 'Edit Sale'),
-      // ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              // Customer Section
+              CustomTextFieldWidget(
+                controller: _customerNameController,
+                labelText: 'Customer Name',
+                prefixIcon: const Icon(Icons.person),
+                validator:
+                    (value) => value?.isEmpty ?? true ? 'Required field' : null,
+              ),
+              const SizedBox(height: 16),
+
+              CustomTextFieldWidget(
+                controller: _customerAddressController,
+                labelText: 'Customer Address',
+                prefixIcon: const Icon(Icons.location_on),
+                validator:
+                    (value) => value?.isEmpty ?? true ? 'Required field' : null,
+              ),
+              const SizedBox(height: 16),
+
               CustomTextFieldWidget(
                 controller: _customerPhoneController,
                 labelText: 'Customer Phone',
@@ -68,7 +95,6 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Product Section
               CustomTextFieldWidget(
                 controller: _productNameController,
                 labelText: 'Product Name',
@@ -103,11 +129,10 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
                         DropdownOption(value: 'g', label: 'Grams'),
                         DropdownOption(value: 'l', label: 'Liters'),
                       ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _selectedUnit = value);
-                        }
-                      },
+                      onChanged:
+                          (value) => setState(
+                            () => _selectedUnit = value ?? _selectedUnit,
+                          ),
                     ),
                   ),
                 ],
@@ -124,33 +149,29 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Date and Payment
               CustomDateSelectorField(
                 labelText: 'Sale Date',
                 initialDate: _selectedDate,
                 onDateSelected: (date) {
-                  if (date != null) {
-                    setState(() => _selectedDate = date);
-                  }
+                  if (date != null) setState(() => _selectedDate = date);
                 },
               ),
               const SizedBox(height: 16),
 
               CustomSingleSelectDropdownField<String>(
-                labelText: 'Payment Method',
-                hintText: 'Select method',
+                labelText: 'Payment',
+                hintText: 'Select Payment',
                 value: _selectedPaymentMethod,
                 items: [
-                  DropdownOption(value: 'cash', label: 'Cash'),
-                  DropdownOption(value: 'card', label: 'Card'),
-                  DropdownOption(value: 'transfer', label: 'Bank Transfer'),
+                  DropdownOption(value: 'paid', label: 'Paid'),
+                  DropdownOption(value: 'due', label: 'Due'),
+                  // DropdownOption(value: 'transfer', label: 'Bank Transfer'),
                 ],
                 onChanged:
                     (value) => setState(() => _selectedPaymentMethod = value),
               ),
               const SizedBox(height: 16),
 
-              // Notes
               CustomTextAreaWidget(
                 controller: _notesController,
                 labelText: 'Notes',
@@ -158,7 +179,6 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Submit Button
               CustomElevatedButton(
                 onPressed: _submitForm,
                 text: widget.sale == null ? 'Record Sale' : 'Update Sale',
@@ -173,10 +193,69 @@ class _AddEditSaleScreenState extends ConsumerState<AddEditSaleScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      // Implement form submission logic
-      // Either call addSaleUseCase or updateSaleUseCase
-      // Show appropriate snackbar on success/error
-    }
+    if (!_formKey.currentState!.validate()) return;
+
+    final input = SaleInputData(
+      saleDate: _selectedDate,
+      customerNameForSale: _customerNameController.text.trim(),
+      customerPhoneForSale: _customerPhoneController.text.trim(),
+      customerAddressForSale: _customerAddressController.text.trim(),
+      customerEmailForSale: null,
+      // Not collected here
+      customerPhotoUrlForSale: null,
+      productName: _productNameController.text.trim(),
+      quantity: num.tryParse(_quantityController.text) ?? 0,
+      unit: _selectedUnit,
+      saleAmount: double.tryParse(_priceController.text) ?? 0,
+      paymentMethod: _selectedPaymentMethod,
+      notes:
+          _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
+      recordedByAppUserId: widget.sale?.recordedBy ?? 'current-user-id',
+    );
+
+    final sale = SaleEntity(
+      id: widget.sale?.id ?? '',
+      date: input.saleDate,
+      customerId: widget.sale?.customerId ?? 'customer-id-placeholder',
+      customerNameAtSale: input.customerNameForSale,
+      customerPhoneAtSale: input.customerPhoneForSale,
+      customerAddressAtSale: input.customerAddressForSale,
+      productDetails: ProductSoldDetails(
+        productName: input.productName,
+        quantity: input.quantity,
+        unit: input.unit,
+        saleAmount: input.saleAmount,
+      ),
+      totalSaleAmount: input.saleAmount,
+      paymentMethod: input.paymentMethod,
+      notes: input.notes,
+      recordedBy: input.recordedByAppUserId,
+      createdAt: widget.sale?.createdAt ?? DateTime.now(),
+      updatedAt: widget.sale != null ? DateTime.now() : null,
+      lastUpdatedBy: widget.sale != null ? input.recordedByAppUserId : null,
+      isDeleted: false,
+      deletedAt: null,
+    );
+
+    final result =
+        widget.sale == null
+            ? await ref.read(addSaleUseCaseProvider).call(input)
+            : await ref.read(updateSaleUseCaseProvider).call(sale);
+
+    result.fold(
+      (failure) => AppSnackBar.showError(context, message: failure.message),
+      (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              widget.sale == null ? 'Sale recorded' : 'Sale updated',
+            ),
+          ),
+        );
+        Navigator.of(context).pop();
+      },
+    );
   }
 }
