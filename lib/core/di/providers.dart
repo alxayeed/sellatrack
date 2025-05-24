@@ -1,32 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource.dart';
-import 'package:sellatrack/features/auth/data/datasources/firebase_auth_datasource_impl.dart';
-import 'package:sellatrack/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:sellatrack/features/auth/domain/entities/auth_user_entity.dart';
-import 'package:sellatrack/features/auth/domain/repositories/auth_repository.dart';
-import 'package:sellatrack/features/auth/domain/usecases/get_auth_state_changes_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/sign_in_with_email_password_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/sign_out_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/sign_up_with_email_password_usecase.dart';
-import 'package:sellatrack/features/auth/domain/usecases/update_user_profile_usecase.dart';
-import 'package:sellatrack/features/customers/data/datasources/customer_firestore_datasource_impl.dart';
-import 'package:sellatrack/features/customers/data/datasources/customer_remote_datasource.dart';
-import 'package:sellatrack/features/customers/data/repositories/customer_repository_impl.dart';
-import 'package:sellatrack/features/customers/domain/repositories/customer_repository.dart';
-import 'package:sellatrack/features/customers/domain/usecases/add_customer_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/delete_customer_photo_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/delete_customer_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/find_customer_by_phone_number_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/find_or_create_customer_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/get_all_customers_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/get_customer_by_id_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/update_customer_photo_url_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/update_customer_purchase_stats_usecase.dart';
-import 'package:sellatrack/features/customers/domain/usecases/update_customer_usecase.dart';
+import 'package:sellatrack/features/auth/domain/usecases/usecases.dart';
 
+import '../../features/auth/data/datasources/firebase_auth_datasource.dart';
+import '../../features/auth/data/datasources/firebase_auth_datasource_impl.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/entities/auth_user_entity.dart';
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/customers/data/datasources/customer_firestore_datasource_impl.dart';
+import '../../features/customers/data/datasources/customer_remote_datasource.dart';
+import '../../features/customers/data/repositories/customer_repository_impl.dart';
+import '../../features/customers/domain/repositories/customer_repository.dart';
+import '../../features/customers/domain/usecases/usecases.dart';
+import '../../features/sales/data/datasources/sale_firestore_datasource_impl.dart';
+import '../../features/sales/data/datasources/sale_remote_datasource.dart';
+import '../../features/sales/data/repositories/sale_repository_impl.dart';
+import '../../features/sales/domain/repositories/sale_repository.dart';
+import '../../features/sales/domain/usecases/usecases.dart';
 import '../errors/error_handler_service.dart';
 
 // --- CORE SERVICE PROVIDERS ---
@@ -42,133 +33,133 @@ final errorHandlerServiceProvider = Provider<ErrorHandlerService>((ref) {
   return const ErrorHandlerService();
 });
 
-// --- AUTH FEATURE DATASOURCE PROVIDERS ---
+// --- DATASOURCE PROVIDERS ---
+// Auth
 final firebaseAuthDatasourceProvider = Provider<FirebaseAuthDatasource>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
   return FirebaseAuthDatasourceImpl(firebaseAuth);
 });
-
-// --- AUTH FEATURE REPOSITORY PROVIDERS ---
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final datasource = ref.watch(firebaseAuthDatasourceProvider);
-  return AuthRepositoryImpl(datasource);
-});
-
-// --- AUTH FEATURE USECASE PROVIDERS ---
-final getAuthStateChangesUseCaseProvider = Provider<GetAuthStateChangesUseCase>(
-  (ref) {
-    final repository = ref.watch(authRepositoryProvider);
-    return GetAuthStateChangesUseCase(repository);
-  },
-);
-
-final signUpWithEmailPasswordUseCaseProvider =
-    Provider<SignUpWithEmailPasswordUseCase>((ref) {
-      final repository = ref.watch(authRepositoryProvider);
-      return SignUpWithEmailPasswordUseCase(repository);
-    });
-
-final signInWithEmailPasswordUseCaseProvider =
-    Provider<SignInWithEmailPasswordUseCase>((ref) {
-      final repository = ref.watch(authRepositoryProvider);
-      return SignInWithEmailPasswordUseCase(repository);
-    });
-
-final updateUserProfileUseCaseProvider = Provider<UpdateUserProfileUseCase>((
-  ref,
-) {
-  final repository = ref.watch(authRepositoryProvider);
-  return UpdateUserProfileUseCase(repository);
-});
-
-final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return GetCurrentUserUseCase(repository);
-});
-
-final signOutUseCaseProvider = Provider<SignOutUseCase>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return SignOutUseCase(repository);
-});
-
-// final sendPasswordResetEmailUseCaseProvider =
-// Provider<SendPasswordResetEmailUseCase>((ref) {
-//   final repository = ref.watch(authRepositoryProvider);
-//   return SendPasswordResetEmailUseCase(repository);
-// });
-
-// --- CUSTOMER FEATURE DATASOURCE PROVIDERS ---
+// Customer
 final customerRemoteDatasourceProvider = Provider<CustomerRemoteDatasource>((
   ref,
 ) {
   final firestore = ref.watch(firebaseFirestoreProvider);
   return CustomerFirestoreDatasourceImpl(firestore);
 });
+// Sale
+final saleRemoteDatasourceProvider = Provider<SaleRemoteDatasource>((ref) {
+  final firestore = ref.watch(firebaseFirestoreProvider);
+  return SaleRemoteDatasourceImpl(firestore);
+});
 
-// --- CUSTOMER FEATURE REPOSITORY PROVIDERS ---
+// --- REPOSITORY PROVIDERS ---
+// Auth
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final datasource = ref.watch(firebaseAuthDatasourceProvider);
+  return AuthRepositoryImpl(datasource);
+});
+// Customer
 final customerRepositoryProvider = Provider<CustomerRepository>((ref) {
   final remoteDatasource = ref.watch(customerRemoteDatasourceProvider);
   return CustomerRepositoryImpl(remoteDatasource: remoteDatasource);
 });
-
-// --- CUSTOMER FEATURE USECASE PROVIDERS ---
-final getCustomerByIdUseCaseProvider = Provider<GetCustomerByIdUseCase>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-  return GetCustomerByIdUseCase(repository);
+// Sale
+final saleRepositoryProvider = Provider<SaleRepository>((ref) {
+  final remoteDatasource = ref.watch(saleRemoteDatasourceProvider);
+  return SaleRepositoryImpl(remoteDatasource: remoteDatasource);
 });
 
-final getAllCustomersUseCaseProvider = Provider<GetAllCustomersUseCase>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-  return GetAllCustomersUseCase(repository);
-});
-
-final findCustomerByPhoneNumberUseCaseProvider =
-    Provider<FindCustomerByPhoneNumberUseCase>((ref) {
-      final repository = ref.watch(customerRepositoryProvider);
-      return FindCustomerByPhoneNumberUseCase(repository);
-    });
-
-final addCustomerUseCaseProvider = Provider<AddCustomerUseCase>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-  return AddCustomerUseCase(repository);
-});
-
-final findOrCreateCustomerUseCaseProvider =
-    Provider<FindOrCreateCustomerUseCase>((ref) {
-      final repository = ref.watch(customerRepositoryProvider);
-      return FindOrCreateCustomerUseCase(repository);
-    });
-
-final updateCustomerUseCaseProvider = Provider<UpdateCustomerUseCase>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-  return UpdateCustomerUseCase(repository);
-});
-
-final deleteCustomerUseCaseProvider = Provider<DeleteCustomerUseCase>((ref) {
-  final repository = ref.watch(customerRepositoryProvider);
-  return DeleteCustomerUseCase(repository);
-});
-
-final updateCustomerPhotoUrlUseCaseProvider =
-    Provider<UpdateCustomerPhotoUrlUseCase>((ref) {
-      final repository = ref.watch(customerRepositoryProvider);
-      return UpdateCustomerPhotoUrlUseCase(repository);
-    });
-
-final deleteCustomerPhotoUseCaseProvider = Provider<DeleteCustomerPhotoUseCase>(
-  (ref) {
-    final repository = ref.watch(customerRepositoryProvider);
-    return DeleteCustomerPhotoUseCase(repository);
-  },
+// --- USECASE PROVIDERS ---
+// Auth
+final getAuthStateChangesUseCaseProvider = Provider<GetAuthStateChangesUseCase>(
+  (ref) => GetAuthStateChangesUseCase(ref.watch(authRepositoryProvider)),
+);
+final signUpWithEmailPasswordUseCaseProvider = Provider<
+  SignUpWithEmailPasswordUseCase
+>((ref) => SignUpWithEmailPasswordUseCase(ref.watch(authRepositoryProvider)));
+final signInWithEmailPasswordUseCaseProvider = Provider<
+  SignInWithEmailPasswordUseCase
+>((ref) => SignInWithEmailPasswordUseCase(ref.watch(authRepositoryProvider)));
+final updateUserProfileUseCaseProvider = Provider<UpdateUserProfileUseCase>(
+  (ref) => UpdateUserProfileUseCase(ref.watch(authRepositoryProvider)),
+);
+final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>(
+  (ref) => GetCurrentUserUseCase(ref.watch(authRepositoryProvider)),
+);
+final signOutUseCaseProvider = Provider<SignOutUseCase>(
+  (ref) => SignOutUseCase(ref.watch(authRepositoryProvider)),
 );
 
+// Customer
+final getCustomerByIdUseCaseProvider = Provider<GetCustomerByIdUseCase>(
+  (ref) => GetCustomerByIdUseCase(ref.watch(customerRepositoryProvider)),
+);
+final getAllCustomersUseCaseProvider = Provider<GetAllCustomersUseCase>(
+  (ref) => GetAllCustomersUseCase(ref.watch(customerRepositoryProvider)),
+);
+final findCustomerByPhoneNumberUseCaseProvider =
+    Provider<FindCustomerByPhoneNumberUseCase>(
+      (ref) => FindCustomerByPhoneNumberUseCase(
+        ref.watch(customerRepositoryProvider),
+      ),
+    );
+final addCustomerUseCaseProvider = Provider<AddCustomerUseCase>(
+  (ref) => AddCustomerUseCase(ref.watch(customerRepositoryProvider)),
+);
+final findOrCreateCustomerUseCaseProvider = Provider<
+  FindOrCreateCustomerUseCase
+>((ref) => FindOrCreateCustomerUseCase(ref.watch(customerRepositoryProvider)));
+final updateCustomerUseCaseProvider = Provider<UpdateCustomerUseCase>(
+  (ref) => UpdateCustomerUseCase(ref.watch(customerRepositoryProvider)),
+);
+final deleteCustomerUseCaseProvider = Provider<DeleteCustomerUseCase>(
+  (ref) => DeleteCustomerUseCase(ref.watch(customerRepositoryProvider)),
+);
+final updateCustomerPhotoUrlUseCaseProvider =
+    Provider<UpdateCustomerPhotoUrlUseCase>(
+      (ref) =>
+          UpdateCustomerPhotoUrlUseCase(ref.watch(customerRepositoryProvider)),
+    );
+final deleteCustomerPhotoUseCaseProvider = Provider<DeleteCustomerPhotoUseCase>(
+  (ref) => DeleteCustomerPhotoUseCase(ref.watch(customerRepositoryProvider)),
+);
 final updateCustomerPurchaseStatsUseCaseProvider =
-    Provider<UpdateCustomerPurchaseStatsUseCase>((ref) {
-      final repository = ref.watch(customerRepositoryProvider);
-      return UpdateCustomerPurchaseStatsUseCase(repository);
-    });
+    Provider<UpdateCustomerPurchaseStatsUseCase>(
+      (ref) => UpdateCustomerPurchaseStatsUseCase(
+        ref.watch(customerRepositoryProvider),
+      ),
+    );
 
-// --- APP STATE PROVIDERS (or Auth State Providers) ---
+// Sale
+final getSaleByIdUseCaseProvider = Provider<GetSaleByIdUseCase>(
+  (ref) => GetSaleByIdUseCase(ref.watch(saleRepositoryProvider)),
+);
+final getAllSalesUseCaseProvider = Provider<GetAllSalesUseCase>(
+  (ref) => GetAllSalesUseCase(ref.watch(saleRepositoryProvider)),
+);
+final addSaleUseCaseProvider = Provider<AddSaleUseCase>((ref) {
+  return AddSaleUseCase(
+    saleRepository: ref.watch(saleRepositoryProvider),
+    findOrCreateCustomerUseCase: ref.watch(findOrCreateCustomerUseCaseProvider),
+    updateCustomerPurchaseStatsUseCase: ref.watch(
+      updateCustomerPurchaseStatsUseCaseProvider,
+    ),
+  );
+});
+final updateSaleUseCaseProvider = Provider<UpdateSaleUseCase>(
+  (ref) => UpdateSaleUseCase(ref.watch(saleRepositoryProvider)),
+);
+final softDeleteSaleUseCaseProvider = Provider<SoftDeleteSaleUseCase>(
+  (ref) => SoftDeleteSaleUseCase(ref.watch(saleRepositoryProvider)),
+);
+final restoreSaleUseCaseProvider = Provider<RestoreSaleUseCase>(
+  (ref) => RestoreSaleUseCase(ref.watch(saleRepositoryProvider)),
+);
+final hardDeleteSaleUseCaseProvider = Provider<HardDeleteSaleUseCase>(
+  (ref) => HardDeleteSaleUseCase(ref.watch(saleRepositoryProvider)),
+);
+
+// --- APP STATE PROVIDERS ---
 final authStateChangesProvider = StreamProvider<AuthUserEntity?>((ref) {
   final getAuthStateChanges = ref.watch(getAuthStateChangesUseCaseProvider);
   return getAuthStateChanges.call();
