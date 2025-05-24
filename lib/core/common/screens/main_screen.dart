@@ -1,31 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ADD THIS
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/common/app_layout/app_drawer_widget.dart';
-import 'package:sellatrack/core/common/app_layout/bottom_nav_bar_widget.dart';
-import 'package:sellatrack/core/common/app_layout/custom_app_bar.dart';
 
-import '../../../features/auth/presentation/notifiers/auth_state.dart';
-import '../../../features/auth/presentation/providers/auth_providers.dart';
-import '../../constants/app_strings.dart';
 import '../../navigation/app_router.dart';
+import '../app_layout/app_drawer_widget.dart';
 
-class MainScreen extends ConsumerWidget {
+class MainScreen extends StatelessWidget {
   final Widget child;
+  final String location;
 
-  const MainScreen({super.key, required this.child});
+  const MainScreen({super.key, required this.child, required this.location});
 
-  int _getSelectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
+  // Top-level screens (no back button)
+  bool get isRootRoute =>
+      location == AppRoutePaths.sales ||
+      location == AppRoutePaths.home ||
+      location == AppRoutePaths.stocks;
 
+  String getAppBarTitle() {
+    if (location.contains(AppRoutePaths.addSaleNamed)) {
+      return 'Add Sale';
+    } else if (location.contains(AppRoutePaths.editSaleSubPath)) {
+      return 'Edit Sale';
+    } else if (location.contains(AppRoutePaths.saleDetailNamed)) {
+      return 'Sale Detail';
+    } else if (location.startsWith(AppRoutePaths.sales)) {
+      return 'Sales';
+    } else if (location.startsWith(AppRoutePaths.stocks)) {
+      return 'Stocks';
+    } else if (location.startsWith(AppRoutePaths.home)) {
+      return 'Home';
+    }
+    return 'Sellatrack';
+  }
+
+  int getSelectedIndex() {
     if (location.startsWith(AppRoutePaths.sales)) return 0;
     if (location.startsWith(AppRoutePaths.home)) return 1;
     if (location.startsWith(AppRoutePaths.stocks)) return 2;
-
-    return 1;
+    return 0;
   }
 
-  void _onBottomNavTap(BuildContext context, int index) {
+  void onTabSelected(BuildContext context, int index) {
     switch (index) {
       case 0:
         context.go(AppRoutePaths.sales);
@@ -40,23 +55,47 @@ class MainScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = _getSelectedIndex(context);
-
-    ref.listen<AuthScreenState>(authNotifierProvider, (prev, next) {
-      if (next.status == AuthStatus.unauthenticated) {
-        context.go(AppRoutePaths.authentication);
-      }
-    });
+  Widget build(BuildContext context) {
+    final selectedIndex = getSelectedIndex();
+    final title = getAppBarTitle();
 
     return Scaffold(
-      appBar: CustomAppBar(title: AppStrings.appName),
-      drawer: const AppDrawerWidget(),
-      body: child,
-      bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: currentIndex,
-        onTap: (index) => _onBottomNavTap(context, index),
+      appBar: AppBar(
+        title: Text(title),
+        centerTitle: true,
+        leading:
+            isRootRoute
+                ? null
+                : IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => context.pop(),
+                ),
       ),
+      body: child,
+      drawer: const AppDrawerWidget(),
+      bottomNavigationBar:
+          isRootRoute
+              ? BottomNavigationBar(
+                currentIndex: selectedIndex,
+                onTap: (index) => onTabSelected(context, index),
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.sell),
+                    label: 'Sales',
+                  ),
+
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.store),
+                    label: 'Stocks',
+                  ),
+                ],
+              )
+              : null,
     );
   }
 }

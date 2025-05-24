@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sellatrack/core/common/app_layout/app_drawer_widget.dart';
-
-import '../../navigation/app_router.dart';
 // We'll use a standard AppBar here for now, CustomAppBar can be integrated if needed.
 
 class HomeScreen extends StatelessWidget {
@@ -56,87 +53,6 @@ class HomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.add_shopping_cart_outlined),
-                label: const Text('Record New Sale'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(200, 48),
-                  // Give buttons some min width
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  textStyle: theme.textTheme.titleMedium,
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Add New Sale - Coming Soon!'),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.receipt_long_outlined),
-                label: const Text('Record New Expense'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(200, 48),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  textStyle: theme.textTheme.titleMedium,
-                  side: BorderSide(color: theme.colorScheme.primary),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Add New Expense - Coming Soon!'),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16), // Spacing for the new button
-              TextButton.icon(
-                // Using TextButton for a less prominent look for now
-                icon: const Icon(Icons.people_alt_outlined),
-                label: const Text('View Customers'),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(200, 48),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  textStyle: theme.textTheme.titleMedium,
-                  foregroundColor: theme.colorScheme.secondary,
-                ),
-                onPressed: () {
-                  context.push(
-                    AppRoutePaths.customers,
-                  ); // Navigate to CustomerListScreen
-                },
-              ),
-
-              TextButton.icon(
-                // Using TextButton for a less prominent look for now
-                icon: const Icon(Icons.people_alt_outlined),
-                label: const Text('Widget Library'),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(200, 48),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  textStyle: theme.textTheme.titleMedium,
-                  foregroundColor: theme.colorScheme.secondary,
-                ),
-                onPressed: () {
-                  context.push(
-                    AppRoutePaths.widgetLibrary,
-                  ); // Navigate to CustomerListScreen
-                },
-              ),
             ],
           ),
         ),

@@ -61,7 +61,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
     });
 
     return Scaffold(
-      appBar: CustomAppBar(title: "Customers"),
+      // appBar: CustomAppBar(title: "Customers"),
       drawer: const AppDrawerWidget(),
 
       body: RefreshIndicator(

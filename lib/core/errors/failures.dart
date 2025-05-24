@@ -38,3 +38,7 @@ class FirestoreFailure extends Failure {
 class InvalidInputFailure extends Failure {
   const InvalidInputFailure({required super.message});
 }
+
+class UnsupportedFailure extends Failure {
+  const UnsupportedFailure({required super.message});
+}
