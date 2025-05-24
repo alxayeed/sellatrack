@@ -1,8 +1,6 @@
-Release 2
-- Customer List
-- Add Customer
-- Edit Customer
-- Customer Details
-- Better error handling
-- Custom snackbar and widgets
-- FIXES: stuck in loader while startup
+Release 3
+- Sales list
+- Sales details
+- Sales add
+- Sales delete
+- New customer creation on sales
