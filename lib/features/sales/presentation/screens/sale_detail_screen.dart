@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/sales/domain/entities/sale_entity.dart';
-
-import '../../../../core/common/common.dart';
 
 class SaleDetailScreen extends StatelessWidget {
   final SaleEntity sale;
@@ -13,18 +9,18 @@ class SaleDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sale #${sale.id.substring(0, 6)}'),
-        actions: [
-          CustomIconButtonWidget(
-            onPressed:
-                () =>
-                    context.pushNamed(AppRoutePaths.editSaleNamed, extra: sale),
-            iconData: Icons.edit,
-            tooltip: 'Edit',
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: Text('Sale #${sale.id.substring(0, 6)}'),
+      //   actions: [
+      //     CustomIconButtonWidget(
+      //       onPressed:
+      //           () =>
+      //               context.pushNamed(AppRoutePaths.editSaleNamed, extra: sale),
+      //       iconData: Icons.edit,
+      //       tooltip: 'Edit',
+      //     ),
+      //   ],
+      // ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/common.dart';
+import '../../../../core/navigation/app_router.dart';
 import '../../domain/entities/sale_entity.dart';
 
 class SaleListItem extends StatelessWidget {
   final SaleEntity sale;
-  final VoidCallback onTap;
+
   final VoidCallback? onDelete;
 
-  const SaleListItem({
-    super.key,
-    required this.sale,
-    required this.onTap,
-    this.onDelete,
-  });
+  const SaleListItem({super.key, required this.sale, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          context.pushNamed(AppRoutePaths.saleDetailNamed, extra: sale);
+        },
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(

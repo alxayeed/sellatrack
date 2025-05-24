@@ -41,7 +41,7 @@ class AppRoutePaths {
   //UPDATE THIS
   static const String sales = '/sales';
   static const String addSaleNamed = 'add-sale';
-  static const String saleDetail = 'detail/:saleId';
+  static const String saleDetail = 'detail';
   static const String saleDetailNamed = 'sale-detail';
   static const String editSaleSubPath = 'edit';
   static const String editSaleNamed = 'edit-sale';
@@ -120,46 +120,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // GoRoute(
-      //   path: AppRoutePaths.sales,
-      //   builder: (context, state) => const SalesListScreen(),
-      //   routes: <RouteBase>[
-      //     GoRoute(
-      //       path: AppRoutePaths.addSaleNamed,
-      //       name: AppRoutePaths.addSaleNamed,
-      //       builder: (context, state) => const AddEditSaleScreen(),
-      //     ),
-      //     GoRoute(
-      //       path: AppRoutePaths.saleDetail,
-      //       name: AppRoutePaths.saleDetailNamed,
-      //       builder: (context, state) {
-      //         final sale = state.extra;
-      //         if (sale is SaleEntity) {
-      //           return SaleDetailScreen(sale: sale);
-      //         }
-      //         return const Scaffold(
-      //           body: Center(child: Text('Sale not found')),
-      //         );
-      //       },
-      //       routes: [
-      //         GoRoute(
-      //           path: AppRoutePaths.editSaleSubPath,
-      //           name: AppRoutePaths.editSaleNamed,
-      //           builder: (context, state) {
-      //             final saleToEdit = state.extra;
-      //             if (saleToEdit is SaleEntity) {
-      //               return AddEditSaleScreen(sale: saleToEdit);
-      //             }
-      //             return const Scaffold(
-      //               body: Center(child: Text('Invalid sale data')),
-      //             );
-      //           },
-      //         ),
-      //       ],
-      //     ),
-      //   ],
-      // ),
-
       // Shell route for main sections with shared layout
       ShellRoute(
         builder: (context, state, child) {
@@ -183,18 +143,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoutePaths.saleDetailNamed,
                 builder: (context, state) {
                   final sale = state.extra;
-                  return SaleDetailScreen(sale: sale as SaleEntity);
+                  if (sale is! SaleEntity) {
+                    return const Scaffold(
+                      body: Center(child: Text('Sale not found or invalid')),
+                    );
+                  }
+                  return SaleDetailScreen(sale: sale);
                 },
-                routes: [
-                  GoRoute(
-                    path: AppRoutePaths.editSaleSubPath,
-                    name: AppRoutePaths.editSaleNamed,
-                    builder: (context, state) {
-                      final saleToEdit = state.extra;
-                      return AddEditSaleScreen(sale: saleToEdit as SaleEntity);
-                    },
-                  ),
-                ],
               ),
             ],
           ),

@@ -16,15 +16,6 @@ class SalesListScreen extends ConsumerWidget {
     final salesState = ref.watch(salesNotifierProvider);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Sales Records'),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.filter_alt),
-      //       onPressed: () => _showFilters(context, ref),
-      //     ),
-      //   ],
-      // ),
       body: salesState.when(
         loading: () => const CustomLoadingIndicatorWidget(),
         error:
@@ -52,11 +43,6 @@ class SalesListScreen extends ConsumerWidget {
                         itemBuilder:
                             (_, index) => SaleListItem(
                               sale: sales[index],
-                              onTap:
-                                  () => context.pushNamed(
-                                    AppRoutePaths.saleDetailNamed,
-                                    extra: sales[index],
-                                  ),
                               onDelete:
                                   () => _confirmDelete(
                                     context,
