@@ -11,6 +11,7 @@ final salesNotifierProvider = StateNotifierProvider.autoDispose<
 >((ref) {
   return SalesNotifier(
     ref.watch(getAllSalesUseCaseProvider),
+    ref.watch(softDeleteSaleUseCaseProvider),
     ref.watch(talkerProvider),
   );
 });

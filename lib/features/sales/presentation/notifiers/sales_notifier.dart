@@ -3,11 +3,14 @@ import 'package:sellatrack/features/sales/domain/entities/sale_entity.dart';
 import 'package:sellatrack/features/sales/domain/usecases/get_all_sales_usecase.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
+import '../../domain/usecases/soft_delete_sale_usecase.dart';
+
 class SalesNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   final GetAllSalesUseCase _getAllSales;
+  final SoftDeleteSaleUseCase _softDeleteSale;
   final Talker _talker;
 
-  SalesNotifier(this._getAllSales, this._talker)
+  SalesNotifier(this._getAllSales, this._softDeleteSale, this._talker)
     : super(const AsyncValue.loading()) {
     loadSales();
   }
@@ -31,18 +34,19 @@ class SalesNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   }
 
   Future<void> softDeleteSale(String saleId, String deletedByUid) async {
-    final previousState = state;
     try {
-      // Optimistic update
-      state = previousState.whenData(
-        (sales) => sales.where((s) => s.id != saleId).toList(),
-      );
-
-      // await _softDeleteUseCase(...); // Call your use case here
+      // Perform backend deletion first
+      await _softDeleteSale.call(saleId: saleId, deletedByUid: deletedByUid);
       _talker.info('Sale $saleId soft deleted');
+      await loadSales();
+
+      // Now update state only if backend confirms deletion
+      // state = previousState.whenData(
+      //   (sales) => sales.where((s) => s.id != saleId).toList(),
+      // );
     } catch (e, st) {
-      state = previousState; // Revert on failure
       _talker.error('Failed to delete sale $saleId', e, st);
+      // AppSnackBar.showError(globalNavigatorKey.currentContext!, message: 'Failed to delete sale');
     }
   }
 }
