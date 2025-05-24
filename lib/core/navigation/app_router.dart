@@ -5,26 +5,18 @@ import 'package:sellatrack/features/auth/presentation/screens/authentication_scr
 import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
 import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
 import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
+import 'package:sellatrack/features/sales/presentation/screens/add_edit_sale_screen.dart';
 
 import '../../features/customers/domain/entities/customer_entity.dart';
 import '../../features/customers/presentation/screens/add_customer_screen.dart';
 import '../../features/customers/presentation/screens/customer_detail_screen.dart';
 import '../../features/customers/presentation/screens/edit_customer_screen.dart';
+import '../../features/sales/domain/entities/sale_entity.dart';
+import '../../features/sales/presentation/screens/sale_detail_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
 import '../common/common.dart';
+import '../common/screens/stocks_screen.dart';
 import 'router_listenable.dart';
-
-class StocksScreen extends StatelessWidget {
-  const StocksScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: null,
-      body: Center(child: Text('Stocks Screen - Coming Soon!')),
-    );
-  }
-}
 
 class AppRoutePaths {
   static const String splash = '/';
@@ -33,7 +25,6 @@ class AppRoutePaths {
   static const String profileCompletion = '/complete-profile';
   static const String widgetLibrary = '/dev/widget-library';
 
-  static const String sales = '/sales';
   static const String stocks = '/stocks';
   static const String customers = '/customers';
   static const String profile = '/profile';
@@ -46,6 +37,14 @@ class AppRoutePaths {
   static const String customerDetailNamed = 'customer-detail';
   static const String editCustomerSubPath = 'edit';
   static const String editCustomerNamed = 'edit-customer-profile';
+
+  //UPDATE THIS
+  static const String sales = '/sales';
+  static const String addSaleNamed = 'add-sale';
+  static const String saleDetail = 'detail/:saleId';
+  static const String saleDetailNamed = 'sale-detail';
+  static const String editSaleSubPath = 'edit';
+  static const String editSaleNamed = 'edit-sale';
 }
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -121,23 +120,91 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // GoRoute(
+      //   path: AppRoutePaths.sales,
+      //   builder: (context, state) => const SalesListScreen(),
+      //   routes: <RouteBase>[
+      //     GoRoute(
+      //       path: AppRoutePaths.addSaleNamed,
+      //       name: AppRoutePaths.addSaleNamed,
+      //       builder: (context, state) => const AddEditSaleScreen(),
+      //     ),
+      //     GoRoute(
+      //       path: AppRoutePaths.saleDetail,
+      //       name: AppRoutePaths.saleDetailNamed,
+      //       builder: (context, state) {
+      //         final sale = state.extra;
+      //         if (sale is SaleEntity) {
+      //           return SaleDetailScreen(sale: sale);
+      //         }
+      //         return const Scaffold(
+      //           body: Center(child: Text('Sale not found')),
+      //         );
+      //       },
+      //       routes: [
+      //         GoRoute(
+      //           path: AppRoutePaths.editSaleSubPath,
+      //           name: AppRoutePaths.editSaleNamed,
+      //           builder: (context, state) {
+      //             final saleToEdit = state.extra;
+      //             if (saleToEdit is SaleEntity) {
+      //               return AddEditSaleScreen(sale: saleToEdit);
+      //             }
+      //             return const Scaffold(
+      //               body: Center(child: Text('Invalid sale data')),
+      //             );
+      //           },
+      //         ),
+      //       ],
+      //     ),
+      //   ],
+      // ),
+
       // Shell route for main sections with shared layout
       ShellRoute(
         builder: (context, state, child) {
-          return MainScreen(child: child);
+          return MainScreen(
+            location: state.fullPath ?? state.uri.toString(),
+            child: child,
+          );
         },
-        routes: <RouteBase>[
+        routes: [
           GoRoute(
             path: AppRoutePaths.sales,
-            builder: (context, state) => const SaleListScreen(),
-          ),
-          GoRoute(
-            path: AppRoutePaths.home,
-            builder: (context, state) => const HomeScreen(),
+            builder: (context, state) => const SalesListScreen(),
+            routes: [
+              GoRoute(
+                path: AppRoutePaths.addSaleNamed,
+                name: AppRoutePaths.addSaleNamed,
+                builder: (context, state) => const AddEditSaleScreen(),
+              ),
+              GoRoute(
+                path: AppRoutePaths.saleDetail,
+                name: AppRoutePaths.saleDetailNamed,
+                builder: (context, state) {
+                  final sale = state.extra;
+                  return SaleDetailScreen(sale: sale as SaleEntity);
+                },
+                routes: [
+                  GoRoute(
+                    path: AppRoutePaths.editSaleSubPath,
+                    name: AppRoutePaths.editSaleNamed,
+                    builder: (context, state) {
+                      final saleToEdit = state.extra;
+                      return AddEditSaleScreen(sale: saleToEdit as SaleEntity);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: AppRoutePaths.stocks,
             builder: (context, state) => const StocksScreen(),
+          ),
+          GoRoute(
+            path: AppRoutePaths.home,
+            builder: (context, state) => const HomeScreen(),
           ),
         ],
       ),
