@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sellatrack/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/usecases.dart';
 
 import '../../features/auth/data/datasources/firebase_auth_datasource.dart';
@@ -93,6 +94,10 @@ final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>(
 );
 final signOutUseCaseProvider = Provider<SignOutUseCase>(
   (ref) => SignOutUseCase(ref.watch(authRepositoryProvider)),
+);
+
+final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>(
+  (ref) => ResetPasswordUseCase(ref.watch(authRepositoryProvider)),
 );
 
 // Customer

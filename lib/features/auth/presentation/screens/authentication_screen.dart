@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sellatrack/core/constants/app_colors.dart';
 import 'package:sellatrack/core/navigation/app_router.dart';
 import 'package:sellatrack/features/auth/presentation/notifiers/auth_state.dart';
 import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
 
 import '../../../../core/common/common.dart';
+import '../../../../core/styles/app_text_styles.dart';
 
 class AuthenticationScreen extends ConsumerStatefulWidget {
   const AuthenticationScreen({super.key});
@@ -63,11 +66,27 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Reset Password'),
-          content: TextField(
-            controller: forgotPasswordEmailController,
-            decoration: const InputDecoration(labelText: 'Enter your email'),
-            keyboardType: TextInputType.emailAddress,
-            autofocus: true,
+          content: SizedBox(
+            height: 110.h,
+            child: Column(
+              children: [
+                Text(
+                  "Check your email/spam for reset link.\nAfter Resetting, come back again to log in",
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.grey,
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                TextField(
+                  controller: forgotPasswordEmailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter your email',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  autofocus: true,
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -89,13 +108,16 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
                     );
                     return;
                   }
-                  // TODO: Uncomment when implemented
-                  // ref.read(authNotifierProvider.notifier).sendPasswordResetEmail(
-                  // forgotPasswordEmailController.text.trim());
+                  ref
+                      .read(authNotifierProvider.notifier)
+                      .sendPasswordResetEmail(
+                        forgotPasswordEmailController.text.trim(),
+                      );
                   Navigator.of(dialogContext).pop();
-                  AppSnackBar.showInfo(
+                  AppSnackBar.showSuccess(
                     context,
-                    message: 'Forgot Password - Coming Soon!',
+                    message:
+                        'Reset link sent successfully. Please check your email',
                   );
                 } else {
                   AppSnackBar.showError(

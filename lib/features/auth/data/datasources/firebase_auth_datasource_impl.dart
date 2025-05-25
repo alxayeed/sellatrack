@@ -71,6 +71,10 @@ class FirebaseAuthDatasourceImpl implements FirebaseAuthDatasource {
   Future<void> sendPasswordResetEmailWithFirebase({
     required String email,
   }) async {
-    await _firebaseAuth.sendPasswordResetEmail(email: email);
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 }

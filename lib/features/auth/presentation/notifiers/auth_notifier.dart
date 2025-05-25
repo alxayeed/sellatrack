@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sellatrack/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:sellatrack/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/sign_in_with_email_password_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:sellatrack/features/auth/domain/usecases/sign_up_with_email_password_usecase.dart';
@@ -14,6 +15,7 @@ class AuthNotifier extends StateNotifier<AuthScreenState> {
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final SignOutUseCase _signOutUseCase;
+  final ResetPasswordUseCase _resetPasswordUseCase;
 
   // Optional: final SendCurrentUserEmailVerificationUseCase _sendCurrentUserEmailVerificationUseCase;
 
@@ -23,6 +25,7 @@ class AuthNotifier extends StateNotifier<AuthScreenState> {
     required UpdateUserProfileUseCase updateUserProfileUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required SignOutUseCase signOutUseCase,
+    required ResetPasswordUseCase resetPasswordUseCase,
 
     // Optional: required SendCurrentUserEmailVerificationUseCase sendCurrentUserEmailVerificationUseCase,
   }) : _signUpWithEmailPasswordUseCase = signUpWithEmailPasswordUseCase,
@@ -30,6 +33,7 @@ class AuthNotifier extends StateNotifier<AuthScreenState> {
        _updateUserProfileUseCase = updateUserProfileUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
        _signOutUseCase = signOutUseCase,
+       _resetPasswordUseCase = resetPasswordUseCase,
        super(const AuthScreenState());
 
   Future<void> signUpWithEmailPassword(String email, String password) async {
@@ -152,20 +156,20 @@ class AuthNotifier extends StateNotifier<AuthScreenState> {
     }
   }
 
-  // Future<void> sendPasswordResetEmail(String email) async {
-  //   state = state.copyWith(status: AuthStatus.loading, clearErrorMessage: true);
-  //   try {
-  //     await _sendPasswordResetEmailUseCase.call(email: email);
-  //     state = state.copyWith(
-  //       status: AuthStatus.initial,
-  //     ); // Or a specific status like passwordResetEmailSent
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //       errorMessage: e.toString(),
-  //       status: AuthStatus.error,
-  //     );
-  //   }
-  // }
+  Future<void> sendPasswordResetEmail(String email) async {
+    state = state.copyWith(status: AuthStatus.loading, clearErrorMessage: true);
+    try {
+      await _resetPasswordUseCase.call(email);
+      state = state.copyWith(
+        status: AuthStatus.initial,
+      ); // Or a specific status like passwordResetEmailSent
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: e.toString(),
+        status: AuthStatus.error,
+      );
+    }
+  }
 
   Future<void> signOut() async {
     state = state.copyWith(status: AuthStatus.loading);
