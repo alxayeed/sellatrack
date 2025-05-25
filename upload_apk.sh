@@ -5,7 +5,7 @@
 flutter build apk --release --flavor prod -t lib/main_prod.dart --split-per-abi
 
 # Step 2: Set variables
-APK_PATH="build/app/outputs/flutter-apk/app-armeabi-v7a-prod-release.apk"
+APK_PATH="build/app/outputs/flutter-apk/app-arm64-v8a-prod-release.apk"
 APP_ID="1:561909823794:android:53dd1f51f42419496cbf2b"
 RELEASE_NOTES_FILE_PATH="release-notes.txt"
 TESTERS_GROUP="al"
