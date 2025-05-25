@@ -7,6 +7,7 @@ import 'package:sellatrack/features/customers/presentation/providers/customer_pr
 import 'package:sellatrack/features/customers/presentation/widgets/customer_list_item_widget.dart';
 
 import '../../../../core/common/common.dart';
+import '../../../../core/di/providers.dart';
 import '../../../../core/navigation/app_router.dart';
 
 class CustomerListScreen extends ConsumerStatefulWidget {
@@ -71,19 +72,22 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
             ),
         child: _buildBody(context, customerState, customerNotifier),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.pushNamed(
-            'customers_add_customer',
-          ); // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(content: Text('Add Customer - Coming Soon!')),
-          // );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Customer'),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-      ),
+      floatingActionButton:
+          ref.read(appConfigProvider).isDev
+              ? FloatingActionButton.extended(
+                onPressed: () {
+                  context.pushNamed(
+                    'customers_add_customer',
+                  ); // ScaffoldMessenger.of(context).showSnackBar(
+                  //   const SnackBar(content: Text('Add Customer - Coming Soon!')),
+                  // );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add Customer'),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+              )
+              : SizedBox.shrink(),
     );
   }
 

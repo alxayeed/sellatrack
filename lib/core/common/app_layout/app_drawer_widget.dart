@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sellatrack/core/navigation/app_router.dart';
-import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart'; // For sign out
+import 'package:sellatrack/features/auth/presentation/providers/auth_providers.dart';
+
+import '../../di/providers.dart'; // For sign out
 // Import AppStrings if you have it
 // import 'package:sellatrack/core/constants/app_strings.dart';
 
@@ -11,6 +13,7 @@ class AppDrawerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bool isDev = ref.read(appConfigProvider).isDev;
     final theme = Theme.of(context);
     final currentUser =
         ref
@@ -86,15 +89,18 @@ class AppDrawerWidget extends ConsumerWidget {
             },
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.widgets),
-            title: const Text('Widget Library'),
-            // Use AppStrings.myProfileTitle
-            onTap: () {
-              Navigator.pop(context);
-              context.push(AppRoutePaths.widgetLibrary);
-            },
-          ),
+          isDev
+              ? ListTile(
+                leading: const Icon(Icons.widgets),
+                title: const Text('Widget Library'),
+                // Use AppStrings.myProfileTitle
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push(AppRoutePaths.widgetLibrary);
+                },
+              )
+              : SizedBox(),
+
           ListTile(
             leading: const Icon(Icons.person_outline_rounded),
             title: const Text('My Profile'), // Use AppStrings.myProfileTitle
