@@ -1,4 +1,4 @@
-Release 4
-- App icon and app name updated
-- Logo updated
-- double app bar fixed in customer details screen
+Release 5
+- Sales feature
+- bug fixing
+- UI improvements
