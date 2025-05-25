@@ -15,5 +15,6 @@ final authNotifierProvider =
         updateUserProfileUseCase: ref.watch(updateUserProfileUseCaseProvider),
         getCurrentUserUseCase: ref.watch(getCurrentUserUseCaseProvider),
         signOutUseCase: ref.watch(signOutUseCaseProvider),
+        resetPasswordUseCase: ref.watch(resetPasswordUseCaseProvider),
       );
     });
