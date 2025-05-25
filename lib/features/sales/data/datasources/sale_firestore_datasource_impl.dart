@@ -1,12 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sellatrack/features/sales/data/datasources/sale_remote_datasource.dart';
 import 'package:sellatrack/features/sales/data/models/sale_model.dart';
 
+import '../../../../core/di/providers.dart';
+
 class SaleRemoteDatasourceImpl implements SaleRemoteDatasource {
   final FirebaseFirestore _firestore;
-  static const String _collectionPath = 'sales';
+  final Ref _ref;
 
-  SaleRemoteDatasourceImpl(this._firestore);
+  String get _collectionPath =>
+      _ref.read(appConfigProvider).collectionName('sales');
+
+  SaleRemoteDatasourceImpl(this._firestore, this._ref);
 
   @override
   Future<String> addSale(SaleModel saleModel) async {
