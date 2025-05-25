@@ -26,7 +26,6 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //TODO: implement go router redirect for this check
       _checkInitialAuthStateAndNavigate();
     });
   }
@@ -35,10 +34,6 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
     if (_initialAuthCheckDone || !mounted) return;
     _initialAuthCheckDone = true;
 
-    // final authUserAsync = ref.read(authStateChangesProvider);
-    // final authUser = authUserAsync.valueOrNull;
-
-    // Option 2: More robustly, use the AuthNotifier which has detailed state
     final authNotifier = ref.read(authNotifierProvider.notifier);
     await authNotifier.checkCurrentUser();
     final currentAuthState = ref.read(authNotifierProvider);
@@ -94,8 +89,9 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
                     );
                     return;
                   }
+                  // TODO: Uncomment when implemented
                   // ref.read(authNotifierProvider.notifier).sendPasswordResetEmail(
-                  // forgotPasswordEmailController.text.trim()); // TODO: Uncomment when method exists in notifier
+                  // forgotPasswordEmailController.text.trim());
                   Navigator.of(dialogContext).pop();
                   AppSnackBar.showInfo(
                     context,
@@ -122,16 +118,18 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
     final theme = Theme.of(context);
 
     ref.listen<AuthScreenState>(authNotifierProvider, (previous, next) {
-      final bool wasLoading =
-          previous?.status == AuthStatus.loading &&
-          (previous!.isLoadingSignIn || previous.isLoadingSignUp);
-      final bool isNowError = next.status == AuthStatus.error;
-
-      if (next.status == AuthStatus.profileIncomplete) {
+      if (next.status == AuthStatus.unauthenticated) {
+        if (mounted) context.go(AppRoutePaths.authentication);
+      } else if (next.status == AuthStatus.profileIncomplete) {
         if (mounted) context.go(AppRoutePaths.profileCompletion);
       } else if (next.status == AuthStatus.authenticated) {
         if (mounted) context.go(AppRoutePaths.home);
       }
+
+      final bool wasLoading =
+          previous?.status == AuthStatus.loading &&
+          (previous!.isLoadingSignIn || previous.isLoadingSignUp);
+      final bool isNowError = next.status == AuthStatus.error;
 
       if (next.errorMessage != null &&
           next.errorMessage!.isNotEmpty &&
@@ -148,11 +146,6 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
       }
     });
 
-    // If initial check already determined a redirect, show loader until GoRouter navigates
-    // This is a bit tricky because the redirect might happen before this build method
-    // if the initial check is very fast. A global redirect is often cleaner for this.
-    // However, if SplashScreen always navigates here, this screen *will* build.
-    // If _initialAuthCheckDone is false AND authState indicates loading from checkCurrentUser, show loader.
     if (!_initialAuthCheckDone &&
         (authState.status == AuthStatus.loading && authState.user == null)) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));

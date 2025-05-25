@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sellatrack/core/common/common.dart';
 import 'package:sellatrack/features/sales/domain/entities/sale_entity.dart';
+
+import '../../../../core/navigation/app_router.dart';
 
 class SaleDetailScreen extends StatelessWidget {
   final SaleEntity sale;
@@ -9,18 +14,6 @@ class SaleDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Sale #${sale.id.substring(0, 6)}'),
-      //   actions: [
-      //     CustomIconButtonWidget(
-      //       onPressed:
-      //           () =>
-      //               context.pushNamed(AppRoutePaths.editSaleNamed, extra: sale),
-      //       iconData: Icons.edit,
-      //       tooltip: 'Edit',
-      //     ),
-      //   ],
-      // ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -45,7 +38,7 @@ class SaleDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             _InfoCard(
               title: 'Product',
               items: [
@@ -67,7 +60,7 @@ class SaleDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             _InfoCard(
               title: 'Transaction',
               items: [
@@ -87,6 +80,18 @@ class SaleDetailScreen extends StatelessWidget {
                   value: sale.notes ?? 'No notes',
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            CustomElevatedButton(
+              onPressed:
+                  () => context.pushNamed(
+                    AppRoutePaths.editSaleNamed,
+                    extra: sale,
+                  ),
+              text: 'Edit',
+              expand: true,
+              isLoading: false,
+              leadingIcon: Icon(Icons.edit, size: 18.sp),
             ),
           ],
         ),

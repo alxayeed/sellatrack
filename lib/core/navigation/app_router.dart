@@ -41,7 +41,7 @@ class AppRoutePaths {
   // Sales routes
   static const String sales = '/sales';
   static const String addSaleNamed = 'add';
-  static const String saleDetail = 'detail/:saleId';
+  static const String saleDetail = 'detail';
   static const String saleDetailNamed = 'sale-detail';
   static const String editSaleSubPath = 'edit';
   static const String editSaleNamed = 'edit-sale';
@@ -101,7 +101,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const AddEditSaleScreen(),
               ),
               GoRoute(
-                path: AppRoutePaths.saleDetail, // 'detail/:saleId'
+                path: AppRoutePaths.saleDetail,
                 name: AppRoutePaths.saleDetailNamed,
                 builder: (context, state) {
                   final sale = state.extra;

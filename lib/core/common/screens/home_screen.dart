@@ -40,12 +40,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-
-      // This is where the child route's screen is displayed
-      // bottomNavigationBar: BottomNavBarWidget(
-      //   currentIndex: navigationShell.currentIndex,
-      //   onTap: _onBottomNavTap,
-      // ),
     );
   }
 }
