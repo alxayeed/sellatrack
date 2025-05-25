@@ -18,6 +18,7 @@ import '../../features/sales/data/datasources/sale_remote_datasource.dart';
 import '../../features/sales/data/repositories/sale_repository_impl.dart';
 import '../../features/sales/domain/repositories/sale_repository.dart';
 import '../../features/sales/domain/usecases/usecases.dart';
+import '../config/app_config.dart';
 import '../errors/error_handler_service.dart';
 
 // --- CORE SERVICE PROVIDERS ---
@@ -33,6 +34,10 @@ final errorHandlerServiceProvider = Provider<ErrorHandlerService>((ref) {
   return const ErrorHandlerService();
 });
 
+final appConfigProvider = Provider<AppConfig>((ref) {
+  throw UnimplementedError('AppConfig not initialized!');
+});
+
 // --- DATASOURCE PROVIDERS ---
 // Auth
 final firebaseAuthDatasourceProvider = Provider<FirebaseAuthDatasource>((ref) {
@@ -44,12 +49,12 @@ final customerRemoteDatasourceProvider = Provider<CustomerRemoteDatasource>((
   ref,
 ) {
   final firestore = ref.watch(firebaseFirestoreProvider);
-  return CustomerFirestoreDatasourceImpl(firestore);
+  return CustomerFirestoreDatasourceImpl(firestore, ref);
 });
 // Sale
 final saleRemoteDatasourceProvider = Provider<SaleRemoteDatasource>((ref) {
   final firestore = ref.watch(firebaseFirestoreProvider);
-  return SaleRemoteDatasourceImpl(firestore);
+  return SaleRemoteDatasourceImpl(firestore, ref);
 });
 
 // --- REPOSITORY PROVIDERS ---

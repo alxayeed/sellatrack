@@ -1,12 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sellatrack/features/customers/data/datasources/customer_remote_datasource.dart';
 import 'package:sellatrack/features/customers/data/models/customer_model.dart';
 
+import '../../../../core/di/providers.dart';
+
 class CustomerFirestoreDatasourceImpl implements CustomerRemoteDatasource {
   final FirebaseFirestore _firestore;
-  static const String _collectionPath = 'customers';
+  final Ref _ref;
 
-  CustomerFirestoreDatasourceImpl(this._firestore);
+  CustomerFirestoreDatasourceImpl(this._firestore, this._ref);
+
+  String get _collectionPath =>
+      _ref.read(appConfigProvider).collectionName('customers');
 
   @override
   Future<String> addCustomer(CustomerModel customerModel) async {

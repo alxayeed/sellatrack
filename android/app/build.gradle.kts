@@ -23,7 +23,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.sellatrack"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -32,6 +31,30 @@ android {
         versionCode = 3
         versionName = "0.1.0"
     }
+
+    flavorDimensions += "env"
+
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+//            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+//            applicationId = "com.example.sellatrackdev"
+        }
+        create("prod") {
+            dimension = "env"
+//            applicationId = "com.example.sellatrack"
+        }
+    }
+
+    // Optional: custom applicationId per flavor
+//    dev {
+//        applicationId "com.yourcompany.sellatrackdev"
+//    }
+//
+//    prod {
+//        applicationId "com.yourcompany.sellatrack"
+//    }
 
     buildTypes {
         release {
