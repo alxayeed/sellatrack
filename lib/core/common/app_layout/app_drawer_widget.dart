@@ -124,7 +124,7 @@ class AppDrawerWidget extends ConsumerWidget {
             // Use AppStrings.signOut
             onTap: () {
               ref.read(authNotifierProvider.notifier).signOut();
-              // context.go(AppRoutePaths.authentication);
+              context.go(AppRoutePaths.authentication);
             },
           ),
         ],
