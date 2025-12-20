@@ -12,13 +12,15 @@ import '../../features/customers/presentation/screens/add_customer_screen.dart';
 import '../../features/customers/presentation/screens/customer_detail_screen.dart';
 import '../../features/customers/presentation/screens/edit_customer_screen.dart';
 import '../../features/sales/domain/entities/sale_entity.dart';
-import '../../features/sales/presentation/screens/sale_detail_screen.dart';
+import 'package.sellatrack/features/sales/presentation/screens/sale_detail_screen.dart';
 import '../../features/sales/presentation/screens/sale_list_screen.dart';
+import '../../../features/investments/presentation/screens/investment_list_screen.dart';
 import '../common/common.dart';
 import '../common/screens/stocks_screen.dart';
 import '../navigation/router_listenable.dart';
 
 class AppRoutePaths {
+  static const String investments = '/investments';
   static const String splash = '/';
   static const String authentication = '/auth';
   static const String home = '/home';
@@ -180,6 +182,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutePaths.stocks,
             builder: (context, state) => const StocksScreen(),
+          ),
+
+          // Investments screen
+          GoRoute(
+            path: AppRoutePaths.investments,
+            builder: (context, state) => const InvestmentListScreen(),
           ),
 
           // Home screen

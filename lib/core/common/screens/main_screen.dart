@@ -14,7 +14,8 @@ class MainScreen extends StatelessWidget {
   bool get isRootRoute =>
       location == AppRoutePaths.sales ||
       location == AppRoutePaths.home ||
-      location == AppRoutePaths.stocks;
+      location == AppRoutePaths.stocks ||
+      location == AppRoutePaths.investments;
 
   String getAppBarTitle() {
     if (location.contains(AppRoutePaths.addSaleNamed)) {
@@ -29,6 +30,8 @@ class MainScreen extends StatelessWidget {
       return 'Stocks';
     } else if (location.startsWith(AppRoutePaths.home)) {
       return 'Home';
+    } else if (location.startsWith(AppRoutePaths.investments)) {
+      return 'Investments';
     }
     return 'Sellatrack';
   }
@@ -37,6 +40,7 @@ class MainScreen extends StatelessWidget {
     if (location.startsWith(AppRoutePaths.sales)) return 0;
     if (location.startsWith(AppRoutePaths.home)) return 1;
     if (location.startsWith(AppRoutePaths.stocks)) return 2;
+    if (location.startsWith(AppRoutePaths.investments)) return 3;
     return 0;
   }
 
@@ -50,6 +54,9 @@ class MainScreen extends StatelessWidget {
         break;
       case 2:
         context.go(AppRoutePaths.stocks);
+        break;
+      case 3:
+        context.go(AppRoutePaths.investments);
         break;
     }
   }
@@ -92,6 +99,10 @@ class MainScreen extends StatelessWidget {
                   BottomNavigationBarItem(
                     icon: Icon(Icons.store),
                     label: 'Stocks',
+                  ),
+                   BottomNavigationBarItem(
+                    icon: Icon(Icons.attach_money),
+                    label: 'Investments',
                   ),
                 ],
               )
