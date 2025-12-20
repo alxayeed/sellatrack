@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../data/investment_repository.dart';
 import '../../domain/entities/investment.dart';
 import '../widgets/custom_date_picker.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class AddInvestmentScreen extends StatefulWidget {
-  final Function(Investment) onSubmit;
-
-  const AddInvestmentScreen({super.key, required this.onSubmit});
+  const AddInvestmentScreen({super.key});
 
   @override
   State<AddInvestmentScreen> createState() => _AddInvestmentScreenState();
@@ -38,7 +38,7 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
         title: const Text('Add Investment'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: Stepper(
@@ -248,8 +248,8 @@ class _AddInvestmentScreenState extends State<AddInvestmentScreen> {
         status: InvestmentStatus.active,
         returns: [],
       );
-      widget.onSubmit(newInvestment);
-      Navigator.of(context).pop();
+      InvestmentRepository().addInvestment(newInvestment);
+      context.pop();
     }
   }
 }

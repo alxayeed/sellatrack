@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../data/investment_repository.dart';
 import '../../domain/entities/investment.dart';
 import '../widgets/custom_date_picker.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class InvestmentDetailScreen extends StatefulWidget {
   final Investment investment;
-  final Function(String, ReturnEntry) onAddReturn;
 
   const InvestmentDetailScreen({
     super.key,
     required this.investment,
-    required this.onAddReturn,
   });
 
   @override
@@ -27,7 +27,7 @@ class _InvestmentDetailScreenState extends State<InvestmentDetailScreen> {
   }
 
   void _handleAddReturn(ReturnEntry returnEntry) {
-    widget.onAddReturn(_investment.id, returnEntry);
+    InvestmentRepository().addReturnEntry(_investment.id, returnEntry);
     setState(() {
       _investment.returns.add(returnEntry);
     });
@@ -40,7 +40,7 @@ class _InvestmentDetailScreenState extends State<InvestmentDetailScreen> {
         title: Text(_investment.title),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: SingleChildScrollView(

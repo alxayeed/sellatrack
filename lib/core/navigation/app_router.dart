@@ -1,207 +1,231 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sellatrack/features/auth/presentation/screens/authentication_screen.dart';
-import 'package:sellatrack/features/auth/presentation/screens/profile_completion_screen.dart';
-import 'package:sellatrack/features/auth/presentation/screens/profile_screen.dart';
-import 'package:sellatrack/features/customers/presentation/screens/customer_list_screen.dart';
-import 'package:sellatrack/features/sales/presentation/screens/add_edit_sale_screen.dart';
 
-import '../../features/customers/domain/entities/customer_entity.dart';
-import '../../features/customers/presentation/screens/add_customer_screen.dart';
-import '../../features/customers/presentation/screens/customer_detail_screen.dart';
-import '../../features/customers/presentation/screens/edit_customer_screen.dart';
-import '../../features/sales/domain/entities/sale_entity.dart';
-import 'package.sellatrack/features/sales/presentation/screens/sale_detail_screen.dart';
-import '../../features/sales/presentation/screens/sale_list_screen.dart';
-import '../../../features/investments/presentation/screens/investment_list_screen.dart';
-import '../common/common.dart';
-import '../common/screens/stocks_screen.dart';
-import '../navigation/router_listenable.dart';
+import '../../features/auth/presentation/screen/profile_screen.dart';
+import '../../features/expense/domain/entities/expense_entity.dart';
+import '../../features/expense/presentation/screens/expense_report_screen.dart';
+import '../../features/expense/presentation/screens/screens.dart';
+import '../../features/lendings/domain/entity/lending/lending_entity.dart';
+import '../../features/lendings/presentation/screens/add_lending_screen.dart';
+import '../../features/lendings/presentation/screens/lending_details_screen.dart';
+import '../../features/lendings/presentation/screens/lending_list_screen.dart';
+import '../../features/lendings/presentation/screens/update_lending_screen.dart';
+import '../../features/investments/domain/entities/investment.dart';
+import '../../features/investments/presentation/screens/add_investment_screen.dart';
+import '../../features/investments/presentation/screens/edit_investment_screen.dart';
+import '../../features/investments/presentation/screens/investment_detail_screen.dart';
+import '../../features/investments/presentation/screens/investment_list_screen.dart';
+import '../common/home_scaffold.dart';
 
-class AppRoutePaths {
-  static const String investments = '/investments';
-  static const String splash = '/';
-  static const String authentication = '/auth';
-  static const String home = '/home';
-  static const String profileCompletion = '/complete-profile';
-  static const String widgetLibrary = '/dev/widget-library';
+class AppRoutes {
+  static const String home = '/';
 
-  static const String stocks = '/stocks';
-  static const String customers = '/customers';
+  // Expenses
+  static const String expenses = '/expenses';
+  static const String addExpense = '/addExpense';
+  static const String expenseDetails = '/expenseDetails';
+  static const String expenseReport = '/expenseReport';
+
+  // Lending Routes
+  static const String lendings = '/lendings';
+  static const String lendingDetails = '/lendingDetails';
+  static const String addLending = '/addLending';
+  static const String updateLending = '/updateLending';
+
+  // Profile
   static const String profile = '/profile';
 
-  static const String updateAuthProfileSubPath = 'edit-auth-profile';
-  static const String updateAuthProfileNamed = 'update-auth-profile';
-
-  static const String addCustomer = 'add';
-  static const String customerDetail = 'detail/:customerId';
-  static const String customerDetailNamed = 'customer-detail';
-  static const String editCustomerSubPath = 'edit';
-  static const String editCustomerNamed = 'edit-customer-profile';
-
-  // Sales routes
-  static const String sales = '/sales';
-  static const String addSaleNamed = 'add';
-  static const String saleDetail = 'detail';
-  static const String saleDetailNamed = 'sale-detail';
-  static const String editSaleSubPath = 'edit';
-  static const String editSaleNamed = 'edit-sale';
+  // Investments
+  static const String investments = '/investments';
+  static const String addInvestment = '/addInvestment';
+  static const String editInvestment = '/editInvestment';
+  static const String investmentDetails = '/investmentDetails';
 }
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'root',
-);
+// --------------------------------------------------------------------------
+// ROUTER IMPLEMENTATION (No Transitions)
+// --------------------------------------------------------------------------
 
-final appRouterProvider = Provider<GoRouter>((ref) {
-  final routerListener = ref.watch(routerListenableProvider);
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  return GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutePaths.splash,
-    debugLogDiagnostics: true,
-    refreshListenable: routerListener,
-    routes: <RouteBase>[
-      // Routes outside the shell (no MainScreen scaffold)
-      GoRoute(
-        path: AppRoutePaths.splash,
-        builder: (context, state) => const AuthenticationScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.widgetLibrary,
-        builder: (context, state) => const WidgetLibraryScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.authentication,
-        builder: (context, state) => const AuthenticationScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.profileCompletion,
-        builder: (context, state) => const ProfileCompletionScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.profile,
-        builder: (context, state) => const ProfileScreen(),
-      ),
-
-      // Shell route wrapping main sections with MainScreen scaffold
+class AppRouter {
+  static final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
+    initialLocation: AppRoutes.expenses,
+    routes: [
+      /// ----------------------------------------------------
+      /// 1. SHELL ROUTE (Routes with Bottom Nav)
+      /// ----------------------------------------------------
       ShellRoute(
-        builder: (context, state, child) {
-          // Use fullPath or location string for MainScreen to determine UI
-          final location = state.fullPath ?? state.uri.toString();
-          return MainScreen(location: location, child: child);
-        },
+        builder: (context, state, child) => HomeScaffold(child: child),
         routes: [
-          // Sales main screen + nested sales routes
+          // A. Expenses Tab
           GoRoute(
-            path: AppRoutePaths.sales,
-            builder: (context, state) => const SalesListScreen(),
-            routes: [
-              GoRoute(
-                path: AppRoutePaths.addSaleNamed, // 'add'
-                name: AppRoutePaths.addSaleNamed,
-                builder: (context, state) => const AddEditSaleScreen(),
-              ),
-              GoRoute(
-                path: AppRoutePaths.saleDetail,
-                name: AppRoutePaths.saleDetailNamed,
-                builder: (context, state) {
-                  final sale = state.extra;
-                  if (sale is! SaleEntity) {
-                    return const Scaffold(
-                      body: Center(child: Text('Sale not found or invalid')),
-                    );
-                  }
-                  return SaleDetailScreen(sale: sale);
-                },
-                routes: [
-                  GoRoute(
-                    path: AppRoutePaths.editSaleSubPath, // 'edit'
-                    name: AppRoutePaths.editSaleNamed,
-                    builder: (context, state) {
-                      final saleToEdit = state.extra;
-                      if (saleToEdit is! SaleEntity) {
-                        return const Scaffold(
-                          body: Center(child: Text('Sale to edit not found')),
-                        );
-                      }
-                      return AddEditSaleScreen(sale: saleToEdit);
-                    },
-                  ),
-                ],
-              ),
-            ],
+            path: AppRoutes.expenses,
+            name: AppRoutes.expenses,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: MonthlyExpenseScreen(),
+            ),
           ),
 
-          // Customers main screen + nested routes
+          // B. Lendings Tab
           GoRoute(
-            path: AppRoutePaths.customers,
-            builder: (context, state) => const CustomerListScreen(),
-            routes: [
-              GoRoute(
-                path: AppRoutePaths.addCustomer, // 'add'
-                name: 'customers_add_customer',
-                builder: (context, state) => const AddCustomerScreen(),
-              ),
-              GoRoute(
-                path: AppRoutePaths.customerDetail, // 'detail/:customerId'
-                name: AppRoutePaths.customerDetailNamed,
-                builder: (context, state) {
-                  final customer = state.extra;
-                  if (customer is CustomerEntity) {
-                    return CustomerDetailScreen(customer: customer);
-                  }
-                  return const Scaffold(
-                    body: Center(child: Text('Customer not found')),
-                  );
-                },
-                routes: [
-                  GoRoute(
-                    path: AppRoutePaths.editCustomerSubPath, // 'edit'
-                    name: AppRoutePaths.editCustomerNamed,
-                    builder: (context, state) {
-                      final customerToEdit = state.extra;
-                      if (customerToEdit is CustomerEntity) {
-                        return EditCustomerScreen(
-                          customerToEdit: customerToEdit,
-                        );
-                      }
-                      return const Scaffold(
-                        body: Center(
-                          child: Text('Customer to edit not found.'),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
+            path: AppRoutes.lendings,
+            name: AppRoutes.lendings,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: LendingListScreen(),
+            ),
           ),
 
-          // Stocks screen
+          // C. Reports Tab
           GoRoute(
-            path: AppRoutePaths.stocks,
-            builder: (context, state) => const StocksScreen(),
+            path: AppRoutes.expenseReport,
+            name: AppRoutes.expenseReport,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ExpenseReportScreen(),
+            ),
           ),
 
-          // Investments screen
+          // D. Profile Tab
           GoRoute(
-            path: AppRoutePaths.investments,
-            builder: (context, state) => const InvestmentListScreen(),
+            path: AppRoutes.profile,
+            name: AppRoutes.profile,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ProfileScreen(),
+            ),
           ),
 
-          // Home screen
+          // E. Investments Tab
           GoRoute(
-            path: AppRoutePaths.home,
-            builder: (context, state) => const HomeScreen(),
+            path: AppRoutes.investments,
+            name: AppRoutes.investments,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: InvestmentListScreen(),
+            ),
           ),
         ],
       ),
-    ],
 
-    // Uncomment and adapt your redirect logic here if needed
-    // redirect: (BuildContext context, GoRouterState state) {
-    //   ...
-    // },
+      /// ----------------------------------------------------
+      /// 2. TOP-LEVEL ROUTES (No Transition)
+      /// ----------------------------------------------------
+
+      // Expenses Detail/Add
+      GoRoute(
+        path: AppRoutes.addExpense,
+        name: AppRoutes.addExpense,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: CreateExpenseScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.expenseDetails,
+        name: AppRoutes.expenseDetails,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          if (extra is! ExpenseEntity) {
+            return const NoTransitionPage(
+              child: ErrorScreen(message: 'Invalid Expense data.'),
+            );
+          }
+          return NoTransitionPage(
+            child: ExpenseDetailsScreen(expense: extra),
+          );
+        },
+      ),
+
+      // Lendings Detail/Add/Update
+      GoRoute(
+        path: AppRoutes.addLending,
+        name: AppRoutes.addLending,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: AddLendingScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.lendingDetails,
+        name: AppRoutes.lendingDetails,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          if (extra is! LendingEntity) {
+            return const NoTransitionPage(
+              child: ErrorScreen(message: 'Invalid Lending data.'),
+            );
+          }
+          return NoTransitionPage(
+            child: LendingDetailsScreen(lending: extra),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.updateLending,
+        name: AppRoutes.updateLending,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          if (extra is! LendingEntity) {
+            return const NoTransitionPage(
+              child: ErrorScreen(message: 'Invalid Lending data.'),
+            );
+          }
+          return NoTransitionPage(
+            child: UpdateLendingScreen(lending: extra),
+          );
+        },
+      ),
+
+      // Investments Detail/Add/Update
+      GoRoute(
+        path: AppRoutes.addInvestment,
+        name: AppRoutes.addInvestment,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: AddInvestmentScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.investmentDetails,
+        name: AppRoutes.investmentDetails,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          if (extra is! Investment) {
+            return const NoTransitionPage(
+              child: ErrorScreen(message: 'Invalid Investment data.'),
+            );
+          }
+          return NoTransitionPage(
+            child: InvestmentDetailScreen(investment: extra),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.editInvestment,
+        name: AppRoutes.editInvestment,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          if (extra is! Investment) {
+            return const NoTransitionPage(
+              child: ErrorScreen(message: 'Invalid Investment data.'),
+            );
+          }
+          return NoTransitionPage(
+            child: EditInvestmentScreen(investment: extra),
+          );
+        },
+      ),
+    ],
   );
-});
+}
+
+// Dummy ErrorScreen
+class ErrorScreen extends StatelessWidget {
+  final String message;
+
+  const ErrorScreen({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Error')),
+      body: Center(child: Text(message)),
+    );
+  }
+}

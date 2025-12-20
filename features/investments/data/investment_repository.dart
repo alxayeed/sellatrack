@@ -1,6 +1,15 @@
 import '../domain/entities/investment.dart';
 
 class InvestmentRepository {
+  // Singleton instance
+  static final InvestmentRepository _instance = InvestmentRepository._internal();
+
+  factory InvestmentRepository() {
+    return _instance;
+  }
+
+  InvestmentRepository._internal();
+
   final List<Investment> _investments = [];
 
   List<Investment> getInvestments() {

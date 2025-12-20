@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/investment_repository.dart';
 import '../../domain/entities/investment.dart';
-import 'add_investment_screen.dart';
-import 'investment_detail_screen.dart';
-import 'edit_investment_screen.dart';
+import '../../../../core/navigation/app_router.dart';
 
 class InvestmentListScreen extends StatefulWidget {
   const InvestmentListScreen({super.key});
@@ -22,51 +21,10 @@ class _InvestmentListScreenState extends State<InvestmentListScreen> {
     _investments = _repository.getInvestments();
   }
 
-  void _addInvestment(Investment investment) {
+  void _refreshInvestments() {
     setState(() {
-      _repository.addInvestment(investment);
       _investments = _repository.getInvestments();
     });
-  }
-
-  void _updateInvestment(Investment investment) {
-    setState(() {
-      _repository.updateInvestment(investment);
-      _investments = _repository.getInvestments();
-    });
-  }
-
-  void _addReturn(String investmentId, ReturnEntry returnEntry) {
-    setState(() {
-      _repository.addReturnEntry(investmentId, returnEntry);
-      _investments = _repository.getInvestments();
-    });
-  }
-
-  void _navigateToDetail(Investment investment) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => InvestmentDetailScreen(
-          investment: investment,
-          onAddReturn: _addReturn,
-        ),
-      ),
-    ).then((_) => setState(() {
-      _investments = _repository.getInvestments();
-    }));
-  }
-
-  void _navigateToEdit(Investment investment) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => EditInvestmentScreen(
-          investment: investment,
-          onUpdate: _updateInvestment,
-        ),
-      ),
-    ).then((_) => setState(() {
-      _investments = _repository.getInvestments();
-    }));
   }
 
   @override
@@ -92,21 +50,24 @@ class _InvestmentListScreenState extends State<InvestmentListScreen> {
                       Text('\$${investment.amountInvested.toStringAsFixed(2)}'),
                       IconButton(
                         icon: const Icon(Icons.edit),
-                        onPressed: () => _navigateToEdit(investment),
+                        onPressed: () async {
+                          await context.push(AppRoutes.editInvestment, extra: investment);
+                          _refreshInvestments();
+                        },
                       ),
                     ],
                   ),
-                  onTap: () => _navigateToDetail(investment),
+                  onTap: () async {
+                    await context.push(AppRoutes.investmentDetails, extra: investment);
+                    _refreshInvestments();
+                  },
                 );
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => AddInvestmentScreen(onSubmit: _addInvestment),
-            ),
-          );
+        onPressed: () async {
+          await context.push(AppRoutes.addInvestment);
+          _refreshInvestments();
         },
         child: const Icon(Icons.add),
       ),

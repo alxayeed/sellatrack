@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../data/investment_repository.dart';
 import '../../domain/entities/investment.dart';
 import '../widgets/custom_date_picker.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class EditInvestmentScreen extends StatefulWidget {
   final Investment investment;
-  final Function(Investment) onUpdate;
 
   const EditInvestmentScreen({
     super.key,
     required this.investment,
-    required this.onUpdate,
   });
 
   @override
@@ -67,7 +67,7 @@ class _EditInvestmentScreenState extends State<EditInvestmentScreen> {
         title: const Text('Edit Investment'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: Stepper(
@@ -290,8 +290,8 @@ class _EditInvestmentScreenState extends State<EditInvestmentScreen> {
         status: _status!,
         returns: widget.investment.returns,
       );
-      widget.onUpdate(updatedInvestment);
-      Navigator.of(context).pop();
+      InvestmentRepository().updateInvestment(updatedInvestment);
+      context.pop();
     }
   }
 }
